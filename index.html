@@ -20,53 +20,70 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
   </style>
 </head>
-<body class="min-h-screen pb-32">
+<body class="min-h-screen pb-20">
 
-  <!-- Üst Bar (iPhone Çentik Uyumlu) -->
-  <header class="px-4 py-3 border-b border-zinc-900 bg-black/95 sticky top-0 z-30 flex justify-between items-center">
-    <div>
-      <h1 id="currentRoutineName" class="text-lg font-bold text-white leading-tight">Program Yok</h1>
-      <p class="text-[10px] text-zinc-500">iPhone 13 Görünümü</p>
-    </div>
-    <div class="flex items-center gap-2">
-      <button onclick="createNewRoutine()" class="text-xs bg-blue-600 active:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm">+ Yeni Program</button>
-      <button onclick="forceCleanReload()" title="Telefonda Yenile" class="text-xs bg-zinc-800 text-zinc-400 p-1.5 rounded-lg">🔄</button>
-    </div>
-  </header>
+  <!-- ================= EKRAN 1: ANA SAYFA (PROGRAM SEÇİMİ) ================= -->
+  <div id="viewHome" class="px-4 max-w-md mx-auto">
+    <header class="py-4 border-b border-zinc-900 flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-black tracking-tight text-white">Antrenmanlar</h1>
+        <p class="text-xs text-zinc-500">Başlamak için bir program seç</p>
+      </div>
+      <button onclick="createNewRoutine()" class="bg-blue-600 active:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-lg shadow-blue-600/20">
+        + Yeni Program
+      </button>
+    </header>
 
-  <!-- Rutin Sekmeleri -->
-  <div id="routineTabs" class="flex gap-2 px-4 py-2 border-b border-zinc-900 overflow-x-auto text-xs font-semibold no-scrollbar"></div>
+    <!-- Program Kartları Listesi -->
+    <div id="routineCardList" class="mt-4 space-y-3"></div>
+  </div>
 
-  <div class="px-3 max-w-md mx-auto">
 
-    <!-- Hevy Tarzı Beyaz Zeminli Anatomik Adam Kartı -->
+  <!-- ================= EKRAN 2: AKTİF ANTRENMAN EKRANI ================= -->
+  <div id="viewWorkout" class="hidden px-3 max-w-md mx-auto">
+    <!-- Üst Gezinme Barı -->
+    <header class="py-3 border-b border-zinc-900 flex justify-between items-center sticky top-0 bg-black/95 z-30">
+      <div class="flex items-center gap-2">
+        <button onclick="goHome()" class="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-300 active:scale-95">
+          ←
+        </button>
+        <div>
+          <h2 id="workoutTitle" class="text-base font-bold text-white leading-tight"></h2>
+          <span id="workoutSubtitle" class="text-[10px] text-zinc-500">Antrenman Modu</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span id="completedCounter" class="text-[11px] bg-blue-600/20 text-blue-400 border border-blue-500/30 px-2.5 py-0.5 rounded-full font-mono font-bold">0 Set</span>
+        <button onclick="deleteCurrentRoutine()" class="text-zinc-600 hover:text-rose-500 text-xs p-1">🗑️</button>
+      </div>
+    </header>
+
+    <!-- Anatomik Kas Modeli Kartı (Sadece Antrenman Ekranında Görünür) -->
     <section class="mt-3 bg-white rounded-2xl p-3 shadow-lg border border-zinc-200 text-zinc-900">
-      <div class="flex justify-between items-center mb-2 px-1">
-        <span class="text-[10px] font-black tracking-wider text-zinc-400 uppercase">HEDEF KASLAR</span>
-        <span id="activeMuscleLabel" class="text-[10px] font-bold text-blue-600 font-mono">Tüm Vücut</span>
+      <div class="flex justify-between items-center mb-1.5 px-1">
+        <span class="text-[9px] font-black tracking-wider text-zinc-400 uppercase">HEDEF KASLAR</span>
+        <span class="text-[9px] font-bold text-blue-600 font-mono">Çalışan Bölgeler</span>
       </div>
 
-      <!-- İstediğin Medikal Kaslı Adam Görselleri (Ön & Arka) -->
       <div class="grid grid-cols-2 gap-2 bg-zinc-50 border border-zinc-200/80 rounded-xl p-2 items-center">
         <!-- Ön Görünüş -->
         <div class="flex flex-col items-center">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ÖN</span>
-          <div class="relative w-28 h-44 flex items-center justify-center overflow-hidden">
-            <img id="frontBodyImg" 
-                 src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" 
-                 onerror="this.src='https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507693998816-4N72U4O3FOPW6R91P896/male-muscles-front.png'" 
+          <span class="text-[8px] font-extrabold text-zinc-400 mb-0.5">ÖN</span>
+          <div class="w-24 h-40 flex items-center justify-center overflow-hidden">
+            <img src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507693998816-4N72U4O3FOPW6R91P896/male-muscles-front.png" 
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png'" 
                  class="w-full h-full object-contain filter contrast-125" alt="Ön Kas">
           </div>
         </div>
 
         <!-- Arka Görünüş -->
         <div class="flex flex-col items-center border-l border-zinc-200 pl-2">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ARKA</span>
-          <div class="relative w-28 h-44 flex items-center justify-center overflow-hidden">
-            <img id="backBodyImg" 
-                 src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507694000302-36I1P6P085P7J68U9W36/male-muscles-back.png" 
+          <span class="text-[8px] font-extrabold text-zinc-400 mb-0.5">ARKA</span>
+          <div class="w-24 h-40 flex items-center justify-center overflow-hidden">
+            <img src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507694000302-36I1P6P085P7J68U9W36/male-muscles-back.png" 
                  onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043890.png'" 
                  class="w-full h-full object-contain filter contrast-125" alt="Arka Kas">
           </div>
@@ -94,23 +111,50 @@
       </div>
     </section>
 
-    <!-- Hareket Listesi -->
+    <!-- Hareket Kartları -->
     <main id="routineContainer" class="mt-3 space-y-3"></main>
 
-    <!-- Alt İşlem Butonları -->
-    <div id="actionButtons" class="mt-4 space-y-2 hidden">
-      <button onclick="openExerciseSelector()" class="w-full py-3.5 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center gap-1 active:bg-blue-700 shadow-md">
-        <span>+</span> Programa Hareket Ekle
-      </button>
-      <button onclick="promptCreateNewExercise()" class="w-full py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold text-xs active:bg-zinc-800">
-        Özel Hareket Oluştur
+    <!-- Buton: Havuzdan Ekle -->
+    <div class="mt-4">
+      <button onclick="openExerciseSelector()" class="w-full py-3.5 rounded-xl bg-blue-600 active:bg-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-md">
+        <span>+</span> Hareketi / Egzersiz Ekle
       </button>
     </div>
   </div>
 
-  <!-- Detay Modalı -->
+
+  <!-- ================= ÇOKLU HAREKET SEÇİM MODALI ================= -->
+  <div id="exercisePickerModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center">
+    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-4 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center mb-2">
+        <div>
+          <h2 class="text-sm font-bold text-white">Egzersiz Havuzundan Seç</h2>
+          <p class="text-[10px] text-zinc-400">İstediğin hareketleri işaretle ve kaydet</p>
+        </div>
+        <button onclick="closeExerciseSelector()" class="text-zinc-400 text-xl font-bold px-2">✕</button>
+      </div>
+
+      <!-- Yeni Hareket Tanımlama Butonu -->
+      <button onclick="promptCreateNewExercise()" class="my-2 w-full py-2 rounded-xl bg-zinc-800/80 border border-zinc-700 text-blue-400 text-xs font-bold">
+        + Havuzda Yoksa Yeni Hareket Üret
+      </button>
+
+      <!-- Hareket Listesi (Çoklu Seçilebilir) -->
+      <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 py-1 pr-1"></div>
+
+      <!-- Alt Kaydet Butonu -->
+      <div class="pt-3 border-t border-zinc-800">
+        <button onclick="saveSelectedExercises()" id="btnConfirmSelect" class="w-full py-3 rounded-xl bg-blue-600 active:bg-blue-700 text-white font-bold text-xs shadow-lg">
+          Seçilenleri Programa Kaydet
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= GELİŞİM & GRAFİK DETAY MODALI ================= -->
   <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center">
-    <div class="bg-zinc-900 border-t border-zinc-800 w-full rounded-t-3xl p-4 max-h-[85vh] overflow-y-auto">
+    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-4 max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-3">
         <div>
           <h2 id="modalExTitle" class="text-base font-bold text-white leading-tight"></h2>
@@ -131,21 +175,9 @@
     </div>
   </div>
 
-  <!-- Egzersiz Seçim Modalı -->
-  <div id="exercisePickerModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center">
-    <div class="bg-zinc-900 border-t border-zinc-800 w-full rounded-t-3xl p-4 max-h-[80vh] flex flex-col">
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-sm font-bold text-white">Havuzdan Egzersiz Seç</h2>
-        <button onclick="closeExerciseSelector()" class="text-zinc-400 text-xl font-bold px-2">✕</button>
-      </div>
-      <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 py-1"></div>
-      <button onclick="promptCreateNewExercise()" class="mt-2 w-full py-2.5 rounded-xl bg-zinc-800 text-blue-400 text-xs font-bold border border-zinc-700">
-        + Yeni Hareket Ekle
-      </button>
-    </div>
-  </div>
 
   <script>
+    // MERKEZİ EGZERSİZ HAVUZU
     let globalExercisePool = JSON.parse(localStorage.getItem("fit_pool")) || [
       { id: "sp", name: "Shoulder Press", muscle: "Omuz", tag: "omuz" },
       { id: "clr", name: "Cable Lateral Raise", muscle: "Omuz", tag: "omuz" },
@@ -157,16 +189,11 @@
       { id: "btk", name: "Biceps Tek Kol", muscle: "Biceps", tag: "kol" }
     ];
 
+    // PROGRAMLAR LİSTESİ
     let routines = JSON.parse(localStorage.getItem("fit_routines")) || [];
-    let currentRoutineId = localStorage.getItem("fit_current_routine") || (routines[0] ? routines[0].id : null);
+    let currentRoutineId = null; // Her açılışta ana sayfada kalması için null başlar
+    let tempSelectedExerciseIds = []; // Modal içindeki geçici seçimler
     let chartInstance = null;
-
-    function forceCleanReload() {
-      if (confirm("Uygulama sıfırlanıp en güncel sürüme yenilensin mi?")) {
-        localStorage.clear();
-        window.location.reload(true);
-      }
-    }
 
     function savePool() { localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool)); }
     function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
@@ -174,118 +201,110 @@
     function saveHistory(exId, history) { localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history)); }
 
     let activeSets = JSON.parse(localStorage.getItem("fit_active_sets") || "{}");
-
     function saveActiveSets() {
       localStorage.setItem("fit_active_sets", JSON.stringify(activeSets));
       updateAnalytics();
     }
 
-    function initActiveSetsForExercise(exId) {
-      if (!activeSets[exId]) {
-        const hist = getHistory(exId);
-        const last = hist[hist.length - 1];
-        activeSets[exId] = [
-          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "Norm", done: false },
-          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "F", done: false }
-        ];
-      }
+    // ================= SAYFA YÖNETİMİ =================
+    function initView() {
+      // Her açılışta garanti olarak Ana Sayfadan başlar
+      goHome();
     }
 
-    function renderTabs() {
-      const container = document.getElementById("routineTabs");
+    function goHome() {
+      currentRoutineId = null;
+      document.getElementById("viewWorkout").classList.add("hidden");
+      document.getElementById("viewHome").classList.remove("hidden");
+      renderHome();
+    }
+
+    function openWorkout(routineId) {
+      currentRoutineId = routineId;
+      document.getElementById("viewHome").classList.add("hidden");
+      document.getElementById("viewWorkout").classList.remove("hidden");
+      renderWorkout();
+    }
+
+    // ================= ANA SAYFA RENDER =================
+    function renderHome() {
+      const container = document.getElementById("routineCardList");
       container.innerHTML = "";
 
       if (routines.length === 0) {
-        document.getElementById("currentRoutineName").innerText = "Program Yok";
+        container.innerHTML = `
+          <div class="bg-zinc-950 border border-zinc-900 rounded-2xl p-8 text-center mt-6">
+            <div class="w-12 h-12 rounded-full bg-blue-600/10 text-blue-500 font-bold text-xl flex items-center justify-center mx-auto mb-3">📋</div>
+            <h3 class="text-sm font-bold text-white mb-1">Kayıtlı Programın Yok</h3>
+            <p class="text-xs text-zinc-500 mb-4">Üstteki butona dokunarak ilk antrenman programını oluşturabilirsin.</p>
+          </div>
+        `;
         return;
       }
 
       routines.forEach(r => {
-        const isActive = r.id === currentRoutineId;
-        const btn = document.createElement("button");
-        btn.className = `px-3.5 py-1.5 rounded-xl whitespace-nowrap transition border ${isActive ? 'bg-blue-600 border-blue-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`;
-        btn.innerText = r.name;
-        btn.onclick = () => switchRoutine(r.id);
-        container.appendChild(btn);
+        const count = r.exerciseIds.length;
+        const card = document.createElement("div");
+        card.className = "bg-zinc-950 border border-zinc-900 hover:border-zinc-800 p-4 rounded-2xl flex items-center justify-between active:scale-[0.99] transition cursor-pointer";
+        card.onclick = () => openWorkout(r.id);
+        card.innerHTML = `
+          <div>
+            <h3 class="text-base font-bold text-white mb-0.5">${r.name}</h3>
+            <p class="text-xs text-zinc-500">${count} Egzersiz Kayıtlı</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-xl">Başlat ›</span>
+          </div>
+        `;
+        container.appendChild(card);
       });
-
-      const current = routines.find(r => r.id === currentRoutineId);
-      if (current) document.getElementById("currentRoutineName").innerText = current.name;
-    }
-
-    function switchRoutine(id) {
-      currentRoutineId = id;
-      localStorage.setItem("fit_current_routine", id);
-      renderTabs();
-      renderApp();
     }
 
     function createNewRoutine() {
-      const name = prompt("Program Adı (Örn: Upper Body):");
+      const name = prompt("Program Adını Gir (Örn: Upper Body, Bacak, Push):");
       if (!name || !name.trim()) return;
 
-      const newId = "r_" + Date.now();
-      routines.push({ id: newId, name: name.trim(), exerciseIds: [] });
+      const newRoutine = {
+        id: "r_" + Date.now(),
+        name: name.trim(),
+        exerciseIds: []
+      };
+
+      routines.push(newRoutine);
       saveRoutines();
-      switchRoutine(newId);
+      openWorkout(newRoutine.id); // Doğrudan içine girer ve hareket eklemeye hazırlar
     }
 
-    function promptCreateNewExercise() {
-      const name = prompt("Yeni Hareketin Adı:");
-      if (!name || !name.trim()) return;
-
-      const region = prompt("Bölge (gogus, omuz, sirt, kol):", "gogus");
-      const tag = region ? region.trim().toLowerCase() : "gogus";
-
-      const newEx = { id: "ex_" + Date.now(), name: name.trim(), muscle: tag.toUpperCase(), tag: tag };
-      globalExercisePool.push(newEx);
-      savePool();
-
-      if (currentRoutineId) {
-        const current = routines.find(r => r.id === currentRoutineId);
-        if (current && !current.exerciseIds.includes(newEx.id)) {
-          current.exerciseIds.push(newEx.id);
-          saveRoutines();
-        }
+    function deleteCurrentRoutine() {
+      if (confirm("Bu programı silmek istediğine emin misin?")) {
+        routines = routines.filter(r => r.id !== currentRoutineId);
+        saveRoutines();
+        goHome();
       }
-      closeExerciseSelector();
-      renderApp();
     }
 
-    function renderApp() {
-      renderTabs();
+    // ================= ANTRENMAN EKRANI RENDER =================
+    function renderWorkout() {
+      const routine = routines.find(r => r.id === currentRoutineId);
+      if (!routine) return goHome();
+
+      document.getElementById("workoutTitle").innerText = routine.name;
+      document.getElementById("workoutSubtitle").innerText = `${routine.exerciseIds.length} Hareket`;
+
       const container = document.getElementById("routineContainer");
-      const actionBox = document.getElementById("actionButtons");
       container.innerHTML = "";
 
-      if (routines.length === 0) {
-        actionBox.classList.add("hidden");
+      if (routine.exerciseIds.length === 0) {
         container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-center mt-3">
-            <h3 class="text-sm font-bold text-white mb-1">Henüz Program Yok</h3>
-            <p class="text-xs text-zinc-400 mb-3">Yukarıdaki "+ Yeni Program" butonuna basarak başla.</p>
+          <div class="bg-zinc-950 border border-zinc-900 rounded-2xl p-6 text-center mt-3">
+            <p class="text-xs text-zinc-500 mb-2">Bu programa henüz hareket eklemedin.</p>
           </div>
         `;
         updateAnalytics();
         return;
       }
 
-      actionBox.classList.remove("hidden");
-      const current = routines.find(r => r.id === currentRoutineId);
-      if (!current) return;
-
-      if (current.exerciseIds.length === 0) {
-        container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-center mt-2">
-            <p class="text-xs text-zinc-400 mb-2">Bu program henüz boş.</p>
-            <button onclick="openExerciseSelector()" class="px-3 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold">Havuzdan Ekle</button>
-          </div>
-        `;
-        updateAnalytics();
-        return;
-      }
-
-      current.exerciseIds.forEach(exId => {
+      routine.exerciseIds.forEach(exId => {
         const ex = globalExercisePool.find(e => e.id === exId);
         if (!ex) return;
 
@@ -343,6 +362,17 @@
       updateAnalytics();
     }
 
+    function initActiveSetsForExercise(exId) {
+      if (!activeSets[exId]) {
+        const hist = getHistory(exId);
+        const last = hist[hist.length - 1];
+        activeSets[exId] = [
+          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "Norm", done: false },
+          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "F", done: false }
+        ];
+      }
+    }
+
     function updateSetVal(exId, idx, field, val) {
       if (activeSets[exId] && activeSets[exId][idx]) {
         activeSets[exId][idx][field] = val;
@@ -356,14 +386,14 @@
       sets.push({ kg: prev ? prev.kg : "", reps: prev ? prev.reps : "", type: "Norm", done: false });
       activeSets[exId] = sets;
       saveActiveSets();
-      renderApp();
+      renderWorkout();
     }
 
     function removeSet(exId) {
       if (activeSets[exId] && activeSets[exId].length > 1) {
         activeSets[exId].pop();
         saveActiveSets();
-        renderApp();
+        renderWorkout();
       }
     }
 
@@ -379,7 +409,7 @@
         hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type });
         saveHistory(exId, hist);
       }
-      renderApp();
+      renderWorkout();
     }
 
     function removeExerciseFromRoutine(exId) {
@@ -387,47 +417,87 @@
       if (!current) return;
       current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
       saveRoutines();
-      renderApp();
+      renderWorkout();
     }
 
+    // ================= ÇOKLU SEÇİM & TOPLU KAYIT MODALI =================
     function openExerciseSelector() {
-      const modal = document.getElementById("exercisePickerModal");
+      const current = routines.find(r => r.id === currentRoutineId);
+      if (!current) return;
+
+      // Mevcut ekli olanları geçici listeye başlangıç olarak koy
+      tempSelectedExerciseIds = [...current.exerciseIds];
+      renderPickerList();
+      document.getElementById("exercisePickerModal").classList.remove("hidden");
+    }
+
+    function renderPickerList() {
       const list = document.getElementById("pickerList");
       list.innerHTML = "";
 
-      const current = routines.find(r => r.id === currentRoutineId);
-      if (!current) return;
-
       globalExercisePool.forEach(ex => {
-        const isAdded = current.exerciseIds.includes(ex.id);
+        const isSelected = tempSelectedExerciseIds.includes(ex.id);
         const item = document.createElement("div");
-        item.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs";
+        item.className = `flex items-center justify-between p-3 rounded-xl border transition cursor-pointer ${isSelected ? 'bg-blue-600/10 border-blue-500' : 'bg-zinc-950 border-zinc-800'}`;
+        item.onclick = () => toggleTempSelection(ex.id);
         item.innerHTML = `
-          <div><p class="font-bold text-white">${ex.name}</p><p class="text-[10px] text-zinc-500">${ex.muscle}</p></div>
-          <button onclick="toggleExerciseInRoutine('${ex.id}')" class="px-2.5 py-1 rounded text-xs font-semibold ${isAdded ? 'bg-rose-500/20 text-rose-400' : 'bg-blue-600 text-white'}">${isAdded ? 'Çıkar' : 'Ekle'}</button>
+          <div>
+            <p class="font-bold text-white text-xs">${ex.name}</p>
+            <p class="text-[10px] text-zinc-500">${ex.muscle}</p>
+          </div>
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${isSelected ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-600'}">
+            ${isSelected ? '✓' : '+'}
+          </div>
         `;
         list.appendChild(item);
       });
-      modal.classList.remove("hidden");
+
+      document.getElementById("btnConfirmSelect").innerText = `${tempSelectedExerciseIds.length} Hareketi Programa Kaydet`;
     }
 
-    function toggleExerciseInRoutine(exId) {
+    function toggleTempSelection(exId) {
+      if (tempSelectedExerciseIds.includes(exId)) {
+        tempSelectedExerciseIds = tempSelectedExerciseIds.filter(id => id !== exId);
+      } else {
+        tempSelectedExerciseIds.push(exId);
+      }
+      renderPickerList();
+    }
+
+    function saveSelectedExercises() {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
-      if (current.exerciseIds.includes(exId)) {
-        current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
-      } else {
-        current.exerciseIds.push(exId);
-      }
+
+      current.exerciseIds = [...tempSelectedExerciseIds];
       saveRoutines();
-      openExerciseSelector();
-      renderApp();
+      closeExerciseSelector();
+      renderWorkout();
     }
 
-    function closeExerciseSelector() { document.getElementById("exercisePickerModal").classList.add("hidden"); }
+    function closeExerciseSelector() {
+      document.getElementById("exercisePickerModal").classList.add("hidden");
+    }
 
+    function promptCreateNewExercise() {
+      const name = prompt("Yeni Hareketin Adı:");
+      if (!name || !name.trim()) return;
+
+      const region = prompt("Bölge (gogus, omuz, sirt, kol):", "gogus");
+      const tag = region ? region.trim().toLowerCase() : "gogus";
+
+      const newEx = { id: "ex_" + Date.now(), name: name.trim(), muscle: tag.toUpperCase(), tag: tag };
+      globalExercisePool.push(newEx);
+      savePool();
+
+      // Otomatik seçilenlere ekle
+      tempSelectedExerciseIds.push(newEx.id);
+      renderPickerList();
+    }
+
+    // ================= KAS SAYACI & ANALİTİK =================
     function updateAnalytics() {
       const current = routines.find(r => r.id === currentRoutineId);
+      let totalDone = 0;
       let muscleCounts = { gogus: 0, omuz: 0, sirt: 0, kol: 0 };
 
       if (current) {
@@ -436,6 +506,7 @@
           const sets = activeSets[exId] || [];
           sets.forEach(s => {
             if (s.done) {
+              totalDone++;
               if (ex.tag === "gogus") muscleCounts.gogus++;
               if (ex.tag === "omuz") muscleCounts.omuz++;
               if (ex.tag === "sirt") muscleCounts.sirt++;
@@ -445,12 +516,14 @@
         });
       }
 
+      document.getElementById("completedCounter").innerText = `${totalDone} Set`;
       document.getElementById("cnt-gogus").innerText = muscleCounts.gogus;
       document.getElementById("cnt-omuz").innerText = muscleCounts.omuz;
       document.getElementById("cnt-sirt").innerText = muscleCounts.sirt;
       document.getElementById("cnt-kol").innerText = muscleCounts.kol;
     }
 
+    // ================= DETAY & GRAFİK =================
     function openDetailModal(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -503,7 +576,8 @@
 
     function closeDetailModal() { document.getElementById("detailModal").classList.add("hidden"); }
 
-    renderApp();
+    // Başlangıç çağrısı
+    initView();
   </script>
 </body>
 </html>
