@@ -24,7 +24,6 @@
     }
     body {
       padding-top: var(--sat);
-      padding-bottom: calc(var(--sab) + 70px);
       background-color: #000000;
       color: #f4f4f5;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -41,7 +40,7 @@
       touch-action: none;
     }
 
-    /* Akıcı Animasyonlar */
+    /* Animasyonlar */
     @keyframes pageSlideIn {
       from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
@@ -66,6 +65,11 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    @keyframes wiggleEffect {
+      0% { transform: rotate(-0.6deg); }
+      50% { transform: rotate(0.6deg); }
+      100% { transform: rotate(-0.6deg); }
+    }
 
     .anim-forward { animation: pageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-back { animation: pageSlideBack 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -73,6 +77,7 @@
     .anim-pop { animation: modalCenterPop 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-sheet { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
+    .wiggle { animation: wiggleEffect 0.2s ease-in-out infinite; }
 
     .tap-press {
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -82,13 +87,13 @@
       opacity: 0.85;
     }
 
-    /* Alt Bar Sabitlemesi */
-    .bottom-nav {
-      padding-bottom: max(var(--sab), 10px);
+    .floating-btn {
+      bottom: calc(var(--sab) + 16px);
+      right: 18px;
     }
   </style>
 </head>
-<body class="min-h-screen antialiased">
+<body class="min-h-screen pb-28 antialiased">
 
   <!-- ================= SAYFA 1: ANA SAYFA (PROGRAMLAR) ================= -->
   <div id="viewHome" class="px-4 max-w-md mx-auto">
@@ -103,6 +108,21 @@
     </header>
 
     <div id="routineCardList" class="mt-4 space-y-3"></div>
+
+    <!-- SAĞ ALTTADURAN MODERN BALONCUK BUTONU -->
+    <div class="fixed floating-btn z-40">
+      <button onclick="openLibraryPage()" class="tap-press w-14 h-14 rounded-full bg-zinc-900/90 border border-zinc-700/80 hover:border-blue-500/80 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl">
+        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 10v4" />
+          <path d="M6 7v10" />
+          <path d="M6 12h12" />
+          <path d="M18 7v10" />
+          <path d="M22 10v4" />
+          <rect x="4.5" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
+          <rect x="18" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
 
@@ -119,6 +139,9 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <button id="btnToggleReorderRoutine" onclick="toggleReorderMode('routine')" class="text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1 rounded-full font-bold">
+          Düzenle
+        </button>
         <span id="completedCounter" class="text-[11px] bg-blue-600/15 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-num font-bold">0 Set</span>
         <button onclick="deleteCurrentRoutine()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-500 hover:text-rose-400 flex items-center justify-center text-xs">
           🗑️
@@ -139,22 +162,32 @@
   <!-- ================= SAYFA 3: TÜM EGZERSİZLER HAVUZU ================= -->
   <div id="viewLibrary" class="hidden px-4 max-w-md mx-auto">
     <header class="py-4 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
-      <div>
-        <h2 class="text-2xl font-black tracking-tight text-white leading-tight">Egzersizler</h2>
-        <span id="libraryCountLabel" class="text-xs text-zinc-500 font-num mt-0.5 block">0 Hareket Kayıtlı</span>
+      <div class="flex items-center gap-2.5">
+        <button onclick="closeLibraryPage()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
+          ←
+        </button>
+        <div>
+          <h2 class="text-xl font-black tracking-tight text-white leading-tight">Egzersizler</h2>
+          <span id="libraryCountLabel" class="text-xs text-zinc-500 font-num">0 Hareket</span>
+        </div>
       </div>
-      <button onclick="openNewExerciseModal(true)" class="tap-press text-xs font-bold bg-blue-600 text-white px-3.5 py-2 rounded-xl shadow-sm border border-blue-500/30">
-        + Yeni Hareket
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="btnToggleReorderLibrary" onclick="toggleReorderMode('library')" class="text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1.5 rounded-xl font-bold">
+          Düzenle
+        </button>
+        <button onclick="openNewExerciseModal(true)" class="tap-press text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-xl shadow-sm border border-blue-500/30">
+          + Yeni
+        </button>
+      </div>
     </header>
 
-    <p class="text-[11px] text-zinc-500 mt-3 px-1">Gelişimini ve maksimum kaldırışlarını görmek istediğin hareketi seç:</p>
+    <p class="text-[11px] text-zinc-500 mt-3 px-1">Sıralamak için basılı tut veya 'Düzenle'ye bas:</p>
 
     <div id="libraryListContainer" class="mt-3 space-y-2.5 mb-8"></div>
   </div>
 
 
-  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAY SAYFASI (NOTSUZ - SADECE İSTATİSTİK) ================= -->
+  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI (SADECE İSTATİSTİK) ================= -->
   <div id="viewLibraryDetail" class="hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeLibraryDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -167,7 +200,6 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- 1. Başlangıç Tarihi & 2. Maksimum Kilo Bilgisi -->
     <div class="grid grid-cols-2 gap-2 mt-4">
       <div class="bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl text-center shadow-md">
         <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">BAŞLANGIÇ TARİHİ</span>
@@ -179,7 +211,6 @@
       </div>
     </div>
 
-    <!-- 3. İlerleyiş Grafiği -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-xs font-bold text-zinc-400 font-num tracking-wide">AĞIRLIK İLERLEYİŞ GRAFİĞİ</h3>
@@ -190,7 +221,6 @@
       </div>
     </section>
 
-    <!-- 4. Antrenman Geçmişi (Tarih Bazlı Set Dökümü) -->
     <section class="mt-4 mb-8">
       <div class="flex justify-between items-center mb-2 px-1">
         <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
@@ -201,7 +231,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 5: PROGRAM İÇİ HAREKET DETAYI (NOTLU ALAN) ================= -->
+  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI (NOT + VİDEO + GEÇMİŞ) ================= -->
   <div id="viewWorkoutExerciseDetail" class="hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeWorkoutExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -214,7 +244,7 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- Özel Not / Ayar Ekleme Alanı -->
+    <!-- 1. EN ÜST: ÖZEL NOT / AYAR EKLEME ALANI -->
     <section class="mt-4 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">HAREKET NOTLARI & AYARLAR</h3>
@@ -223,14 +253,33 @@
       <textarea id="workoutExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-800/80 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
+    <!-- 2. ORTA: VİDEO KUTUSU (BİRAZDAN EKLENECEK VİDEOLAR İÇİN HAZIR ALTYAPI) -->
+    <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM & YAPILIŞ VİDEOSU</h3>
+        <span class="text-[10px] text-zinc-500">Rehber</span>
+      </div>
+      <div id="workoutVideoContainer" class="bg-black/90 border border-zinc-850 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
+        <div class="w-10 h-10 rounded-full bg-rose-600/20 text-rose-500 flex items-center justify-center text-base mb-2">
+          ▶
+        </div>
+        <p class="text-xs font-bold text-white" id="workoutVideoLabel">Video Bağlantısı</p>
+        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel form rehberi birazdan bağlanacak.</p>
+      </div>
+    </section>
+
+    <!-- 3. ALT: GEÇMİŞ DÖKÜMÜ (AYNI GÜNLER BİR ARADA) -->
     <section class="mt-3.5 mb-8">
-      <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider mb-2 px-1">Son Seanslar</h3>
+      <div class="flex justify-between items-center mb-2 px-1">
+        <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
+        <span class="text-[10px] text-zinc-500">Detaylar</span>
+      </div>
       <div id="workoutExHistoryList" class="space-y-2"></div>
     </section>
   </div>
 
 
-  <!-- ================= POPUP 1: YENİ PROGRAM ================= -->
+  <!-- ================= POPUPLAR ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
     <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
       <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
@@ -248,8 +297,6 @@
     </div>
   </div>
 
-
-  <!-- ================= POPUP 2: YENİ HAREKET TANIMLA ================= -->
   <div id="newExerciseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewExerciseModal(event)">
     <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
       <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
@@ -269,8 +316,6 @@
     </div>
   </div>
 
-
-  <!-- ================= ALTTAN PANEL: ÇOKLU SEÇİM ================= -->
   <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
     <div class="bg-zinc-950 border-t border-zinc-800/80 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
       <div class="w-12 h-1.5 bg-zinc-800 rounded-full mx-auto mb-3.5"></div>
@@ -298,36 +343,6 @@
   </div>
 
 
-  <!-- ================= SABİT ALT GEZİNME BARI (MODERN HEVY TARZI) ================= -->
-  <nav id="bottomNavBar" class="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-t border-zinc-850 bottom-nav">
-    <div class="max-w-md mx-auto grid grid-cols-2 h-14">
-      
-      <!-- Sol Sekme: Programlar -->
-      <button onclick="switchTab('home')" id="tabBtnHome" class="flex flex-col items-center justify-center gap-1 transition tap-press text-blue-500">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-        <span class="text-[10px] font-bold tracking-tight">Programlar</span>
-      </button>
-
-      <!-- Sağ Sekme: Egzersizler (Gerçekçi Dumbbell İkonu) -->
-      <button onclick="switchTab('library')" id="tabBtnLibrary" class="flex flex-col items-center justify-center gap-1 transition tap-press text-zinc-500">
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 10v4" />
-          <path d="M6 7v10" />
-          <path d="M6 12h12" />
-          <path d="M18 7v10" />
-          <path d="M22 10v4" />
-          <rect x="4.5" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.2"/>
-          <rect x="18" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.2"/>
-        </svg>
-        <span class="text-[10px] font-bold tracking-tight">Egzersizler</span>
-      </button>
-
-    </div>
-  </nav>
-
-
   <script>
     let globalExercisePool = JSON.parse(localStorage.getItem("fit_pool")) || [
       { id: "sp", name: "Shoulder Press", muscle: "Omuz" },
@@ -346,6 +361,9 @@
     let isCreatingFromLibrary = false;
     let tempSelectedExerciseIds = [];
     let chartInstance = null;
+    let isReorderingRoutine = false;
+    let isReorderingLibrary = false;
+    let longPressTimer = null;
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
@@ -353,7 +371,6 @@
     function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
     function getHistory(exId) { return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]"); }
     function saveHistory(exId, history) { localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history)); }
-    
     function saveRoutineSets() {
       localStorage.setItem("fit_routine_sets", JSON.stringify(routineSets));
       updateCompletedCounter();
@@ -362,30 +379,52 @@
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
 
-    // --- TAB GEÇİŞLERİ ---
-    function switchTab(tab) {
-      const btnHome = document.getElementById("tabBtnHome");
-      const btnLib = document.getElementById("tabBtnLibrary");
+    // --- UZUN BASMA (LONG-PRESS) TESPİTİ ---
+    function attachLongPress(element, callback) {
+      const start = () => {
+        longPressTimer = setTimeout(() => {
+          callback();
+        }, 550);
+      };
+      const cancel = () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+      };
 
-      if (tab === 'home') {
-        btnHome.className = "flex flex-col items-center justify-center gap-1 transition tap-press text-blue-500";
-        btnLib.className = "flex flex-col items-center justify-center gap-1 transition tap-press text-zinc-500";
-        goHome();
-      } else if (tab === 'library') {
-        btnLib.className = "flex flex-col items-center justify-center gap-1 transition tap-press text-blue-500";
-        btnHome.className = "flex flex-col items-center justify-center gap-1 transition tap-press text-zinc-500";
-        openLibraryPage();
+      element.addEventListener("touchstart", start, { passive: true });
+      element.addEventListener("touchend", cancel);
+      element.addEventListener("touchmove", cancel);
+      element.addEventListener("mousedown", start);
+      element.addEventListener("mouseup", cancel);
+      element.addEventListener("mouseleave", cancel);
+    }
+
+    function toggleReorderMode(scope) {
+      if (scope === 'routine') {
+        isReorderingRoutine = !isReorderingRoutine;
+        const btn = document.getElementById("btnToggleReorderRoutine");
+        btn.innerText = isReorderingRoutine ? "Bitti ✓" : "Düzenle";
+        btn.className = isReorderingRoutine ? "text-[11px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1 rounded-full font-bold";
+        renderWorkout(false);
+      } else if (scope === 'library') {
+        isReorderingLibrary = !isReorderingLibrary;
+        const btn = document.getElementById("btnToggleReorderLibrary");
+        btn.innerText = isReorderingLibrary ? "Bitti ✓" : "Düzenle";
+        btn.className = isReorderingLibrary ? "text-[11px] bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1.5 rounded-xl font-bold";
+        renderLibrary();
       }
     }
 
-    // --- SAYFA YÖNETİMİ ---
+    // --- SAYFA GEÇİŞLERİ ---
     function goHome() {
       currentRoutineId = null;
+      isReorderingRoutine = false;
       document.getElementById("viewWorkout").classList.add("hidden");
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      document.getElementById("bottomNavBar").classList.remove("hidden");
       
       const vHome = document.getElementById("viewHome");
       vHome.classList.remove("hidden");
@@ -396,11 +435,11 @@
 
     function openWorkout(routineId) {
       currentRoutineId = routineId;
+      isReorderingRoutine = false;
       document.getElementById("viewHome").classList.add("hidden");
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      document.getElementById("bottomNavBar").classList.add("hidden"); // Antrenmandayken alt bar gizlenir
 
       const vWorkout = document.getElementById("viewWorkout");
       vWorkout.classList.remove("hidden");
@@ -480,7 +519,7 @@
       }
     }
 
-    // --- ANTRENMAN MODU ---
+    // --- ANTRENMAN MODU (SIRALAMA & DÜZENLEME) ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -519,8 +558,13 @@
         const lastRec = hist[hist.length - 1];
 
         const card = document.createElement("div");
-        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md ${animate ? 'anim-card' : ''}`;
+        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/40' : ''}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
+
+        // Uzun basma olayı
+        attachLongPress(card, () => {
+          if (!isReorderingRoutine) toggleReorderMode('routine');
+        });
 
         let setsHtml = "";
         sets.forEach((set, idx) => {
@@ -547,14 +591,23 @@
 
         card.innerHTML = `
           <div class="flex items-center justify-between mb-2">
-            <!-- Program içi detay (Notları olan ekran) -->
-            <div class="cursor-pointer flex-1 py-1" onclick="openWorkoutExerciseDetail('${ex.id}')">
+            <div class="cursor-pointer flex-1 py-1" onclick="${isReorderingRoutine ? '' : `openWorkoutExerciseDetail('${ex.id}')`}">
               <h3 class="text-blue-400 font-extrabold text-sm hover:underline leading-tight tracking-tight flex items-center gap-1.5">
                 ${ex.name} <span class="text-zinc-600 text-[10px]">›</span>
               </h3>
               <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
             </div>
-            <button onclick="removeExerciseFromRoutine('${ex.id}')" class="tap-press text-zinc-600 hover:text-rose-400 text-xs px-2 py-1">✕</button>
+
+            <!-- Düzenleme / Sıralama Kontrolleri -->
+            ${isReorderingRoutine ? `
+              <div class="flex items-center gap-1">
+                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▲</button>
+                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▼</button>
+                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-7 h-7 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-bold active:scale-90 ml-1">✕</button>
+              </div>
+            ` : `
+              <button onclick="removeExerciseFromRoutine('${ex.id}')" class="tap-press text-zinc-600 hover:text-rose-400 text-xs px-2 py-1">✕</button>
+            `}
           </div>
 
           ${sets.length > 0 ? `
@@ -578,6 +631,20 @@
       updateCompletedCounter();
     }
 
+    function moveRoutineExercise(index, direction) {
+      const routine = routines.find(r => r.id === currentRoutineId);
+      if (!routine) return;
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= routine.exerciseIds.length) return;
+
+      const temp = routine.exerciseIds[index];
+      routine.exerciseIds[index] = routine.exerciseIds[targetIndex];
+      routine.exerciseIds[targetIndex] = temp;
+
+      saveRoutines();
+      renderWorkout(false);
+    }
+
     function updateSetVal(exId, idx, field, val) {
       if (routineSets[currentRoutineId] && routineSets[currentRoutineId][exId] && routineSets[currentRoutineId][exId][idx]) {
         routineSets[currentRoutineId][exId][idx][field] = val;
@@ -594,7 +661,6 @@
       const hist = getHistory(exId);
       const lastRec = hist[hist.length - 1];
 
-      // Sadece 1 set olarak son kilo/rep/tür otomatik çekilir
       sets.push({
         kg: prev ? prev.kg : (lastRec ? lastRec.kg : ""),
         reps: prev ? prev.reps : (lastRec ? lastRec.reps : ""),
@@ -655,13 +721,18 @@
       document.getElementById("viewWorkout").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      document.getElementById("bottomNavBar").classList.remove("hidden");
 
       const vLib = document.getElementById("viewLibrary");
       vLib.classList.remove("hidden");
       vLib.classList.remove("anim-back");
       vLib.classList.add("anim-forward");
       renderLibrary();
+    }
+
+    function closeLibraryPage() {
+      document.getElementById("viewLibrary").classList.add("hidden");
+      isReorderingLibrary = false;
+      goHome();
     }
 
     function getMaxKg(hist) {
@@ -680,32 +751,68 @@
     function renderLibrary() {
       const container = document.getElementById("libraryListContainer");
       container.innerHTML = "";
-      document.getElementById("libraryCountLabel").innerText = `${globalExercisePool.length} Hareket Kayıtlı`;
+      document.getElementById("libraryCountLabel").innerText = `${globalExercisePool.length} Hareket`;
 
       globalExercisePool.forEach((ex, idx) => {
         const hist = getHistory(ex.id);
         const maxKg = getMaxKg(hist);
 
         const card = document.createElement("div");
-        card.className = "tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md";
-        card.style.animationDelay = `${idx * 25}ms`;
-        card.onclick = () => openLibraryDetail(ex.id);
+        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md ${isReorderingLibrary ? 'wiggle border-blue-500/40' : ''}`;
+        card.style.animationDelay = `${idx * 20}ms`;
+
+        attachLongPress(card, () => {
+          if (!isReorderingLibrary) toggleReorderMode('library');
+        });
+
+        card.onclick = () => {
+          if (!isReorderingLibrary) openLibraryDetail(ex.id);
+        };
 
         card.innerHTML = `
           <div>
             <h4 class="text-sm font-extrabold text-white tracking-tight">${ex.name}</h4>
             <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
           </div>
-          <div class="text-right font-num">
-            <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider">MAX KG</span>
-            <span class="text-xs font-black ${maxKg ? 'text-blue-400' : 'text-zinc-600'}">${maxKg ? maxKg + ' KG' : 'Kayıt Yok'}</span>
-          </div>
+          
+          ${isReorderingLibrary ? `
+            <div class="flex items-center gap-1" onclick="event.stopPropagation()">
+              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▲</button>
+              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▼</button>
+              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-7 h-7 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-bold active:scale-90 ml-1">✕</button>
+            </div>
+          ` : `
+            <div class="text-right font-num">
+              <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider">MAX KG</span>
+              <span class="text-xs font-black ${maxKg ? 'text-blue-400' : 'text-zinc-600'}">${maxKg ? maxKg + ' KG' : 'Kayıt Yok'}</span>
+            </div>
+          `}
         `;
         container.appendChild(card);
       });
     }
 
-    // --- KÜTÜPHANE DETAY SAYFASI (SADECE: BAŞLANGIÇ, MAKS KG, GRAFİK, GEÇMİŞ) ---
+    function moveLibraryExercise(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= globalExercisePool.length) return;
+
+      const temp = globalExercisePool[index];
+      globalExercisePool[index] = globalExercisePool[targetIndex];
+      globalExercisePool[targetIndex] = temp;
+
+      savePool();
+      renderLibrary();
+    }
+
+    function deleteGlobalExercise(exId) {
+      if (confirm("Bu hareketi havuzdan tamamen silmek istiyor musun?")) {
+        globalExercisePool = globalExercisePool.filter(e => e.id !== exId);
+        savePool();
+        renderLibrary();
+      }
+    }
+
+    // --- KÜTÜPHANE DETAYI (SADECE İSTATİSTİK) ---
     function openLibraryDetail(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -721,61 +828,125 @@
       document.getElementById("libDetailMaxKg").innerText = maxKg ? `${maxKg} KG` : "Kayıt Yok";
       document.getElementById("libDetailFirstDate").innerText = (hist.length > 0) ? hist[0].date : "Kayıt Yok";
 
-      if (hist.length === 0) {
-        histContainer.innerHTML = `<p class="text-zinc-600 text-xs py-4 text-center font-medium bg-zinc-950 border border-zinc-800/80 rounded-2xl">Henüz tamamlanan set kaydı yok.</p>`;
-      } else {
-        const grouped = {};
-        hist.forEach(item => {
-          if (!grouped[item.date]) grouped[item.date] = [];
-          grouped[item.date].push(item);
-        });
+      renderGroupedHistory(hist, histContainer, "lib_day_");
 
-        const days = Object.keys(grouped).reverse();
+      const ctx = document.getElementById('libDetailChart').getContext('2d');
+      renderProgressionChart(ctx, hist);
 
-        days.forEach((day, dIdx) => {
-          const daySets = grouped[day];
-          const lastSet = daySets[daySets.length - 1];
+      document.getElementById("viewLibrary").classList.add("hidden");
+      const vDetail = document.getElementById("viewLibraryDetail");
+      vDetail.classList.remove("hidden");
+      vDetail.classList.remove("anim-back");
+      vDetail.classList.add("anim-forward");
+    }
 
-          const groupCard = document.createElement("div");
-          groupCard.className = "bg-zinc-950 border border-zinc-800/80 rounded-2xl overflow-hidden transition";
+    function closeLibraryDetail() {
+      document.getElementById("viewLibraryDetail").classList.add("hidden");
+      openLibraryPage();
+    }
 
-          let subSetsRows = "";
-          daySets.forEach((s, sIdx) => {
-            subSetsRows += `
-              <div class="flex justify-between items-center py-1.5 border-b border-zinc-850/60 last:border-b-0 text-[11px] font-num">
-                <span class="text-zinc-500 font-bold">${s.setNumber || sIdx + 1}. Set</span>
-                <span class="font-extrabold text-white">${s.kg} KG</span>
-                <span class="text-zinc-400 font-medium">${s.reps} Rep</span>
-                <span class="${s.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${s.type}]</span>
-              </div>
-            `;
-          });
+    // --- PROGRAM İÇİ DETAY SAYFASI (NOT + VİDEO + GEÇMİŞ) ---
+    function openWorkoutExerciseDetail(exId) {
+      selectedDetailExId = exId;
+      const ex = globalExercisePool.find(e => e.id === exId);
+      if (!ex) return;
 
-          groupCard.innerHTML = `
-            <div class="p-3.5 flex justify-between items-center cursor-pointer tap-press" onclick="toggleDayDetails('lib_day_${dIdx}')">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-white font-num">${day}</span>
-                  <span class="text-[10px] text-zinc-500 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded font-num">${daySets.length} Set</span>
-                </div>
-                <p class="text-[11px] text-zinc-400 font-num mt-1">Son Set: <span class="text-blue-400 font-bold">${lastSet.kg} KG</span> × ${lastSet.reps} Rep <span class="text-rose-400">[${lastSet.type}]</span></p>
-              </div>
-              <span class="text-zinc-500 text-xs font-mono transition-transform duration-200" id="arrow_lib_day_${dIdx}">▼</span>
-            </div>
+      document.getElementById("workoutExDetailTitle").innerText = ex.name;
+      document.getElementById("workoutExDetailMuscle").innerText = ex.muscle;
 
-            <div id="lib_day_${dIdx}" class="hidden px-3.5 pb-3 pt-1 border-t border-zinc-850 bg-black/50">
-              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">O Günün Tüm Setleri</span>
-              ${subSetsRows}
-            </div>
-          `;
-          histContainer.appendChild(groupCard);
-        });
+      // 1. Not Yükle
+      const note = localStorage.getItem(`fit_note_${exId}`) || "";
+      document.getElementById("workoutExNoteInput").value = note;
+
+      // 2. Video Kutusu Durumu
+      document.getElementById("workoutVideoLabel").innerText = `${ex.name} Form Rehberi`;
+
+      // 3. Antrenman Geçmişi (Tarih Bazlı Gruplanmış)
+      const hist = getHistory(exId);
+      const histContainer = document.getElementById("workoutExHistoryList");
+      histContainer.innerHTML = "";
+      renderGroupedHistory(hist, histContainer, "workout_day_");
+
+      document.getElementById("viewWorkout").classList.add("hidden");
+      const vWDetail = document.getElementById("viewWorkoutExerciseDetail");
+      vWDetail.classList.remove("hidden");
+      vWDetail.classList.remove("anim-back");
+      vWDetail.classList.add("anim-forward");
+    }
+
+    function closeWorkoutExerciseDetail() {
+      document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
+      const vWorkout = document.getElementById("viewWorkout");
+      vWorkout.classList.remove("hidden");
+      vWorkout.classList.remove("anim-forward");
+      vWorkout.classList.add("anim-back");
+      renderWorkout(false);
+    }
+
+    function saveWorkoutExerciseNote() {
+      if (!selectedDetailExId) return;
+      const note = document.getElementById("workoutExNoteInput").value;
+      localStorage.setItem(`fit_note_${selectedDetailExId}`, note);
+      alert("Not kaydedildi!");
+    }
+
+    // --- ORTAK TARİH BAZLI GEÇMİŞ OLUŞTURUCU ---
+    function renderGroupedHistory(hist, container, prefix) {
+      if (!hist || hist.length === 0) {
+        container.innerHTML = `<p class="text-zinc-600 text-xs py-4 text-center font-medium bg-zinc-950 border border-zinc-800/80 rounded-2xl">Henüz tamamlanan set kaydı yok.</p>`;
+        return;
       }
 
-      // İlerleyiş Grafiği
-      const ctx = document.getElementById('libDetailChart').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
+      const grouped = {};
+      hist.forEach(item => {
+        if (!grouped[item.date]) grouped[item.date] = [];
+        grouped[item.date].push(item);
+      });
 
+      const days = Object.keys(grouped).reverse();
+
+      days.forEach((day, dIdx) => {
+        const daySets = grouped[day];
+        const lastSet = daySets[daySets.length - 1];
+
+        const groupCard = document.createElement("div");
+        groupCard.className = "bg-zinc-950 border border-zinc-800/80 rounded-2xl overflow-hidden transition";
+
+        let subSetsRows = "";
+        daySets.forEach((s, sIdx) => {
+          subSetsRows += `
+            <div class="flex justify-between items-center py-1.5 border-b border-zinc-850/60 last:border-b-0 text-[11px] font-num">
+              <span class="text-zinc-500 font-bold">${s.setNumber || sIdx + 1}. Set</span>
+              <span class="font-extrabold text-white">${s.kg} KG</span>
+              <span class="text-zinc-400 font-medium">${s.reps} Rep</span>
+              <span class="${s.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${s.type}]</span>
+            </div>
+          `;
+        });
+
+        groupCard.innerHTML = `
+          <div class="p-3.5 flex justify-between items-center cursor-pointer tap-press" onclick="toggleDayDetails('${prefix}${dIdx}')">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-white font-num">${day}</span>
+                <span class="text-[10px] text-zinc-500 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded font-num">${daySets.length} Set</span>
+              </div>
+              <p class="text-[11px] text-zinc-400 font-num mt-1">Son Set: <span class="text-blue-400 font-bold">${lastSet.kg} KG</span> × ${lastSet.reps} Rep <span class="text-rose-400">[${lastSet.type}]</span></p>
+            </div>
+            <span class="text-zinc-500 text-xs font-mono transition-transform duration-200" id="arrow_${prefix}${dIdx}">▼</span>
+          </div>
+
+          <div id="${prefix}${dIdx}" class="hidden px-3.5 pb-3 pt-1 border-t border-zinc-850 bg-black/50">
+            <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">O Günün Tüm Setleri</span>
+            ${subSetsRows}
+          </div>
+        `;
+        container.appendChild(groupCard);
+      });
+    }
+
+    function renderProgressionChart(ctx, hist) {
+      if (chartInstance) chartInstance.destroy();
       const labels = hist.map(h => h.date);
       const dataPoints = hist.map(h => {
         const nums = h.kg.match(/\d+(\.\d+)?/g);
@@ -807,69 +978,6 @@
           }
         }
       });
-
-      document.getElementById("viewLibrary").classList.add("hidden");
-      document.getElementById("bottomNavBar").classList.add("hidden"); // Detaydayken alt barı gizle
-      const vDetail = document.getElementById("viewLibraryDetail");
-      vDetail.classList.remove("hidden");
-      vDetail.classList.remove("anim-back");
-      vDetail.classList.add("anim-forward");
-    }
-
-    function closeLibraryDetail() {
-      document.getElementById("viewLibraryDetail").classList.add("hidden");
-      document.getElementById("bottomNavBar").classList.remove("hidden");
-      openLibraryPage();
-    }
-
-    // --- PROGRAM İÇİ HAREKET DETAYI (NOTLU ALAN) ---
-    function openWorkoutExerciseDetail(exId) {
-      selectedDetailExId = exId;
-      const ex = globalExercisePool.find(e => e.id === exId);
-      if (!ex) return;
-
-      document.getElementById("workoutExDetailTitle").innerText = ex.name;
-      document.getElementById("workoutExDetailMuscle").innerText = ex.muscle;
-
-      const note = localStorage.getItem(`fit_note_${exId}`) || "";
-      document.getElementById("workoutExNoteInput").value = note;
-
-      const hist = getHistory(exId);
-      const histContainer = document.getElementById("workoutExHistoryList");
-      histContainer.innerHTML = "";
-
-      if (hist.length === 0) {
-        histContainer.innerHTML = `<p class="text-zinc-600 text-xs py-3 text-center bg-zinc-950 border border-zinc-800/80 rounded-2xl font-medium">Kayıt yok.</p>`;
-      } else {
-        [...hist].slice(-5).reverse().forEach(h => {
-          const row = document.createElement("div");
-          row.className = "flex justify-between items-center bg-zinc-950 border border-zinc-800/80 p-2.5 rounded-xl text-[11px] font-num";
-          row.innerHTML = `<span class="text-zinc-500">${h.date}</span><span class="font-bold text-white">${h.kg} KG</span><span class="text-zinc-400">${h.reps} Rep</span><span class="${h.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${h.type}]</span>`;
-          histContainer.appendChild(row);
-        });
-      }
-
-      document.getElementById("viewWorkout").classList.add("hidden");
-      const vWDetail = document.getElementById("viewWorkoutExerciseDetail");
-      vWDetail.classList.remove("hidden");
-      vWDetail.classList.remove("anim-back");
-      vWDetail.classList.add("anim-forward");
-    }
-
-    function closeWorkoutExerciseDetail() {
-      document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      const vWorkout = document.getElementById("viewWorkout");
-      vWorkout.classList.remove("hidden");
-      vWorkout.classList.remove("anim-forward");
-      vWorkout.classList.add("anim-back");
-      renderWorkout(false);
-    }
-
-    function saveWorkoutExerciseNote() {
-      if (!selectedDetailExId) return;
-      const note = document.getElementById("workoutExNoteInput").value;
-      localStorage.setItem(`fit_note_${selectedDetailExId}`, note);
-      alert("Not kaydedildi!");
     }
 
     function toggleDayDetails(elId) {
