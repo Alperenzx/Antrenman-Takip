@@ -85,12 +85,12 @@
 
   <!-- ================= SAYFA 1: ANA SAYFA ================= -->
   <div id="viewHome" class="px-4 max-w-md mx-auto">
-    <header class="py-5 border-b border-zinc-900/60 flex justify-between items-center">
+    <header class="py-5 border-b border-zinc-800/80 flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-black tracking-tight text-white">Programlar</h1>
         <p class="text-xs text-zinc-500 font-medium mt-0.5">Antrenmana başlamak için seç</p>
       </div>
-      <button onclick="openNewRoutineModal()" class="tap-press bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-lg shadow-blue-600/20 flex items-center gap-1">
+      <button onclick="openNewRoutineModal()" class="tap-press bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs px-4 py-2.5 rounded-2xl shadow-lg shadow-blue-600/20 flex items-center gap-1 border border-blue-500/30">
         <span class="text-sm font-extrabold">+</span> Yeni Program
       </button>
     </header>
@@ -101,9 +101,9 @@
 
   <!-- ================= SAYFA 2: AKTİF ANTRENMAN EKRANI ================= -->
   <div id="viewWorkout" class="hidden px-3 max-w-md mx-auto">
-    <header class="py-3 border-b border-zinc-900/60 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
+    <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <div class="flex items-center gap-2.5">
-        <button onclick="goHome()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900/80 border border-zinc-800/60 flex items-center justify-center text-sm font-bold text-zinc-300">
+        <button onclick="goHome()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
           ←
         </button>
         <div>
@@ -112,8 +112,8 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span id="completedCounter" class="text-[11px] bg-blue-600/15 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full font-num font-bold">0 Set</span>
-        <button onclick="deleteCurrentRoutine()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900/80 border border-zinc-800/60 text-zinc-500 hover:text-rose-400 flex items-center justify-center text-xs">
+        <span id="completedCounter" class="text-[11px] bg-blue-600/15 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-num font-bold">0 Set</span>
+        <button onclick="deleteCurrentRoutine()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-500 hover:text-rose-400 flex items-center justify-center text-xs">
           🗑️
         </button>
       </div>
@@ -122,17 +122,17 @@
     <main id="routineContainer" class="mt-3.5 space-y-3"></main>
 
     <div class="mt-4">
-      <button onclick="openExerciseSelector()" class="tap-press w-full py-4 rounded-2xl bg-zinc-950 border border-zinc-900 text-blue-400 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md">
+      <button onclick="openExerciseSelector()" class="tap-press w-full py-4 rounded-2xl bg-zinc-950 border border-zinc-800/80 text-blue-400 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md">
         <span class="text-base font-bold">+</span> Egzersiz Ekle
       </button>
     </div>
   </div>
 
 
-  <!-- ================= SAYFA 3: HAREKETE ÖZEL DETAY SAYFASI (YEPYENİ SAYFA) ================= -->
+  <!-- ================= SAYFA 3: HAREKETE ÖZEL DETAY SAYFASI ================= -->
   <div id="viewExerciseDetail" class="hidden px-4 max-w-md mx-auto">
-    <header class="py-3 border-b border-zinc-900/60 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
-      <button onclick="closeExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900/80 border border-zinc-800/60 flex items-center justify-center text-sm font-bold text-zinc-300">
+    <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
+      <button onclick="closeExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
         ←
       </button>
       <div class="text-center flex-1 px-2">
@@ -142,11 +142,11 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- Kademeli Ağırlık Artış Çizelgesi -->
-    <section class="mt-4 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg">
+    <!-- Ağırlık Artış Çizelgesi -->
+    <section class="mt-4 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
-        <h3 class="text-xs font-bold text-zinc-400 font-num tracking-wide">AĞIRLIK ARTIŞ GELİŞİMİ</h3>
-        <span class="text-[10px] text-zinc-500 font-num">Son Antrenmanlar</span>
+        <h3 class="text-xs font-bold text-zinc-400 font-num tracking-wide">AĞIRLIK GELİŞİMİ</h3>
+        <span class="text-[10px] text-zinc-500 font-num">Seans Bazlı</span>
       </div>
       <div class="h-44 w-full">
         <canvas id="detailProgressionChart"></canvas>
@@ -154,17 +154,20 @@
     </section>
 
     <!-- Özel Not / Ayar Ekleme Alanı -->
-    <section class="mt-3.5 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg">
+    <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">HAREKET NOTLARI & AYARLAR</h3>
-        <button onclick="saveExerciseNote()" class="tap-press text-[11px] text-blue-400 font-bold bg-blue-600/10 px-2.5 py-1 rounded-lg">Kaydet</button>
+        <button onclick="saveExerciseNote()" class="tap-press text-[11px] text-blue-400 font-bold bg-blue-600/10 border border-blue-500/20 px-2.5 py-1 rounded-lg">Kaydet</button>
       </div>
-      <textarea id="detailExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-850 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
+      <textarea id="detailExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-800/80 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
-    <!-- Geçmiş Kayıtlar Tablosu -->
+    <!-- Gün Bazında Gruplanmış Geçmiş Kayıtlar -->
     <section class="mt-3.5 mb-8">
-      <h3 class="text-xs font-bold text-zinc-500 mb-2 px-1 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
+      <div class="flex justify-between items-center mb-2 px-1">
+        <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
+        <span class="text-[10px] text-zinc-500">Detay için dokun</span>
+      </div>
       <div id="detailExHistoryList" class="space-y-2"></div>
     </section>
   </div>
@@ -172,18 +175,18 @@
 
   <!-- ================= POPUP 1: YENİ PROGRAM ADI ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
-    <div class="bg-zinc-950 border border-zinc-850 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
-      <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
+    <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
         📋
       </div>
       <h3 class="text-center text-lg font-black text-white mb-1 tracking-tight">Yeni Program</h3>
       <p class="text-center text-xs text-zinc-500 mb-5 font-medium">Programına bir isim ver.</p>
 
-      <input id="newRoutineInput" type="text" placeholder="Örn: Upper Body, Push, Bacak" class="w-full bg-black border border-zinc-800 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-sm text-white focus:outline-none mb-5 transition font-semibold">
+      <input id="newRoutineInput" type="text" placeholder="Örn: Upper Body, Push, Bacak" class="w-full bg-black border border-zinc-800/80 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-sm text-white focus:outline-none mb-5 transition font-semibold">
 
       <div class="flex gap-2.5">
-        <button onclick="closeNewRoutineModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold text-xs">Vazgeç</button>
-        <button onclick="submitNewRoutine()" class="tap-press flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/25">Oluştur</button>
+        <button onclick="closeNewRoutineModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-400 font-bold text-xs">Vazgeç</button>
+        <button onclick="submitNewRoutine()" class="tap-press flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/25 border border-blue-500/30">Oluştur</button>
       </div>
     </div>
   </div>
@@ -191,20 +194,20 @@
 
   <!-- ================= POPUP 2: YENİ HAREKET TANIMLA ================= -->
   <div id="newExerciseModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewExerciseModal(event)">
-    <div class="bg-zinc-950 border border-zinc-850 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
-      <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
+    <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
         💪
       </div>
       <h3 class="text-center text-lg font-black text-white mb-1 tracking-tight">Yeni Egzersiz</h3>
       <p class="text-center text-xs text-zinc-500 mb-4 font-medium">Hareket adını ve kas grubunu belirle.</p>
 
-      <input id="newExNameInput" type="text" placeholder="Hareket Adı (Örn: Incline DB Press)" class="w-full bg-black border border-zinc-800 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-xs text-white focus:outline-none mb-2.5 transition font-semibold">
+      <input id="newExNameInput" type="text" placeholder="Hareket Adı (Örn: Incline DB Press)" class="w-full bg-black border border-zinc-800/80 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-xs text-white focus:outline-none mb-2.5 transition font-semibold">
 
-      <input id="newExMuscleInput" type="text" placeholder="Bölge (Göğüs, Omuz, Sırt, Kol)" class="w-full bg-black border border-zinc-800 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-xs text-white focus:outline-none mb-5 transition font-semibold">
+      <input id="newExMuscleInput" type="text" placeholder="Bölge (Göğüs, Omuz, Sırt, Kol)" class="w-full bg-black border border-zinc-800/80 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-xs text-white focus:outline-none mb-5 transition font-semibold">
 
       <div class="flex gap-2.5">
-        <button onclick="closeNewExerciseModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold text-xs">İptal</button>
-        <button onclick="submitNewExercise()" class="tap-press flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/25">Havuza Ekle</button>
+        <button onclick="closeNewExerciseModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-400 font-bold text-xs">İptal</button>
+        <button onclick="submitNewExercise()" class="tap-press flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/25 border border-blue-500/30">Havuza Ekle</button>
       </div>
     </div>
   </div>
@@ -212,7 +215,7 @@
 
   <!-- ================= ALTTAN PANEL: ÇOKLU SEÇİM ================= -->
   <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
-    <div class="bg-zinc-950 border-t border-zinc-900 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
+    <div class="bg-zinc-950 border-t border-zinc-800/80 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
       <div class="w-12 h-1.5 bg-zinc-800 rounded-full mx-auto mb-3.5"></div>
       
       <div class="flex justify-between items-center mb-2 px-1">
@@ -223,14 +226,14 @@
         <button onclick="closeExerciseSelector()" class="tap-press text-zinc-500 text-lg font-bold p-1">✕</button>
       </div>
 
-      <button onclick="openNewExerciseModal()" class="tap-press my-3 w-full py-3 rounded-2xl bg-black border border-zinc-850 text-blue-400 text-xs font-bold shadow-sm">
+      <button onclick="openNewExerciseModal()" class="tap-press my-3 w-full py-3 rounded-2xl bg-black border border-zinc-800/80 text-blue-400 text-xs font-bold shadow-sm">
         + Listede Olmayan Yeni Hareket Üret
       </button>
 
       <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 py-1 pr-1 overscroll-contain"></div>
 
-      <div class="pt-3.5 border-t border-zinc-900 mt-2">
-        <button onclick="saveSelectedExercises()" id="btnConfirmSelect" class="tap-press w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25">
+      <div class="pt-3.5 border-t border-zinc-850 mt-2">
+        <button onclick="saveSelectedExercises()" id="btnConfirmSelect" class="tap-press w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs shadow-lg shadow-blue-600/25 border border-blue-500/30">
           Seçilenleri Kaydet
         </button>
       </div>
@@ -270,7 +273,6 @@
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
 
-    // --- SAYFA GEÇİŞLERİ ---
     function goHome() {
       currentRoutineId = null;
       document.getElementById("viewWorkout").classList.add("hidden");
@@ -299,8 +301,8 @@
 
       if (routines.length === 0) {
         container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-900 rounded-[28px] p-8 text-center mt-6">
-            <div class="w-14 h-14 rounded-2xl bg-blue-600/10 text-blue-500 font-bold text-2xl flex items-center justify-center mx-auto mb-3">📋</div>
+          <div class="bg-zinc-950 border border-zinc-800/80 rounded-[28px] p-8 text-center mt-6">
+            <div class="w-14 h-14 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-500 font-bold text-2xl flex items-center justify-center mx-auto mb-3">📋</div>
             <h3 class="text-base font-extrabold text-white mb-1">Henüz Program Yok</h3>
             <p class="text-xs text-zinc-500 mb-5 font-medium leading-relaxed">Yeni bir antrenman programı oluşturarak egzersizlerini eklemeye başlayabilirsin.</p>
           </div>
@@ -311,7 +313,7 @@
       routines.forEach((r, idx) => {
         const count = r.exerciseIds.length;
         const card = document.createElement("div");
-        card.className = "tap-press bg-zinc-950 border border-zinc-900 p-4 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md";
+        card.className = "tap-press bg-zinc-950 border border-zinc-800/80 p-4 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md";
         card.style.animationDelay = `${idx * 40}ms`;
         card.onclick = () => openWorkout(r.id);
         card.innerHTML = `
@@ -325,7 +327,6 @@
       });
     }
 
-    // --- PROGRAM MODALI ---
     function openNewRoutineModal() {
       const modal = document.getElementById("newRoutineModal");
       const input = document.getElementById("newRoutineInput");
@@ -360,7 +361,6 @@
       }
     }
 
-    // --- ANTRENMAN MODU (SADECE HAREKET ADI VE İSTEĞE BAĞLI SET EKLEME) ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -373,7 +373,7 @@
 
       if (routine.exerciseIds.length === 0) {
         container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-900 rounded-[28px] p-6 text-center mt-3">
+          <div class="bg-zinc-950 border border-zinc-800/80 rounded-[28px] p-6 text-center mt-3">
             <p class="text-xs text-zinc-400 mb-1 font-semibold">Bu program henüz boş.</p>
             <p class="text-[11px] text-zinc-600 font-medium">Alttaki butona basarak hareket ekleyebilirsin.</p>
           </div>
@@ -386,7 +386,6 @@
         const ex = globalExercisePool.find(e => e.id === exId);
         if (!ex) return;
 
-        // Setler başlangıçta otomatik üretilmez; kullanıcı ekledikçe gelir
         if (!activeSets[exId]) {
           activeSets[exId] = [];
         }
@@ -396,35 +395,35 @@
         const lastRec = hist[hist.length - 1];
 
         const card = document.createElement("div");
-        card.className = `bg-zinc-950 border border-zinc-900 rounded-[24px] p-4 shadow-md ${animate ? 'anim-card' : ''}`;
+        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md ${animate ? 'anim-card' : ''}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
 
         let setsHtml = "";
         sets.forEach((set, idx) => {
           const isDone = set.done;
           setsHtml += `
-            <div class="grid grid-cols-[22px_1fr_1fr_52px_36px] gap-2 items-center bg-black/60 p-2 rounded-xl border ${isDone ? 'border-blue-500/40 bg-blue-950/20' : 'border-zinc-900'} transition">
+            <div class="grid grid-cols-[22px_1fr_1fr_52px_36px] gap-2 items-center bg-black/60 p-2 rounded-xl border ${isDone ? 'border-blue-500/40 bg-blue-950/20' : 'border-zinc-850'} transition">
               <span class="text-[11px] font-bold ${isDone ? 'text-blue-400' : 'text-zinc-500'} text-center font-num">${idx + 1}</span>
               
-              <input type="text" placeholder="${lastRec ? lastRec.kg : 'KG'}" value="${set.kg}" onchange="updateSetVal('${ex.id}', ${idx}, 'kg', this.value)" class="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-blue-500/50 font-num font-bold">
+              <!-- Sadece Sayı Klavyesi (inputmode="decimal") -->
+              <input type="text" inputmode="decimal" pattern="[0-9]*" placeholder="${lastRec ? lastRec.kg : 'KG'}" value="${set.kg}" onchange="updateSetVal('${ex.id}', ${idx}, 'kg', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-blue-500/60 font-num font-bold">
               
-              <input type="text" placeholder="${lastRec ? lastRec.reps : 'Rep'}" value="${set.reps}" onchange="updateSetVal('${ex.id}', ${idx}, 'reps', this.value)" class="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-blue-500/50 font-num font-bold">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" placeholder="${lastRec ? lastRec.reps : 'Rep'}" value="${set.reps}" onchange="updateSetVal('${ex.id}', ${idx}, 'reps', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-blue-500/60 font-num font-bold">
               
-              <select onchange="updateSetVal('${ex.id}', ${idx}, 'type', this.value)" class="w-full bg-zinc-950 border border-zinc-850 rounded-lg p-2 text-center text-[10px] font-extrabold ${set.type === 'F' ? 'text-rose-400' : 'text-zinc-300'} focus:outline-none font-num">
+              <select onchange="updateSetVal('${ex.id}', ${idx}, 'type', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-[10px] font-extrabold ${set.type === 'F' ? 'text-rose-400' : 'text-zinc-300'} focus:outline-none font-num">
                 <option value="Norm" ${set.type === 'Norm' ? 'selected' : ''}>OK</option>
                 <option value="F" ${set.type === 'F' ? 'selected' : ''}>F</option>
                 <option value="R1" ${set.type === 'R1' ? 'selected' : ''}>R1</option>
                 <option value="R2" ${set.type === 'R2' ? 'selected' : ''}>R2</option>
               </select>
               
-              <button onclick="toggleSet('${ex.id}', ${idx})" class="tap-press w-9 h-9 rounded-xl font-extrabold flex items-center justify-center text-xs transition ${isDone ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-zinc-900 text-zinc-500'}">✓</button>
+              <button onclick="toggleSet('${ex.id}', ${idx})" class="tap-press w-9 h-9 rounded-xl font-extrabold flex items-center justify-center text-xs transition ${isDone ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30' : 'bg-zinc-900 border border-zinc-800 text-zinc-500'}">✓</button>
             </div>
           `;
         });
 
         card.innerHTML = `
           <div class="flex items-center justify-between mb-2">
-            <!-- Tıklayınca YEPYENİ SAYFAYI AÇAR -->
             <div class="cursor-pointer flex-1 py-1" onclick="openExerciseDetail('${ex.id}')">
               <h3 class="text-blue-400 font-extrabold text-sm hover:underline leading-tight tracking-tight flex items-center gap-1.5">
                 ${ex.name} <span class="text-zinc-600 text-[10px]">›</span>
@@ -443,8 +442,8 @@
             </div>
           ` : ''}
 
-          <div class="flex justify-between items-center ${sets.length > 0 ? 'pt-2 border-t border-zinc-900/80' : 'pt-1'}">
-            <button onclick="addSet('${ex.id}')" class="tap-press text-[11px] font-bold text-blue-400 py-1 px-2.5 rounded-lg bg-blue-600/10">+ Set Ekle</button>
+          <div class="flex justify-between items-center ${sets.length > 0 ? 'pt-2 border-t border-zinc-850' : 'pt-1'}">
+            <button onclick="addSet('${ex.id}')" class="tap-press text-[11px] font-bold text-blue-400 py-1.5 px-3 rounded-xl bg-blue-600/10 border border-blue-500/20">+ Set Ekle</button>
             ${sets.length > 0 ? `
               <button onclick="removeSet('${ex.id}')" class="tap-press text-[10px] text-zinc-500 hover:text-rose-400 py-1 px-2 font-medium">- Set Sil</button>
             ` : '<span></span>'}
@@ -497,7 +496,7 @@
       if (set.done) {
         const hist = getHistory(exId);
         const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
-        hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type });
+        hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type, setNumber: idx + 1 });
         saveHistory(exId, hist);
       }
       renderWorkout(false);
@@ -523,7 +522,7 @@
       document.getElementById("completedCounter").innerText = `${totalDone} Set`;
     }
 
-    // --- YEPYENİ TAM EKRAN HAREKET DETAY SAYFASI ---
+    // --- HAREKETE ÖZEL DETAY SAYFASI ---
     function openExerciseDetail(exId) {
       selectedDetailExId = exId;
       const ex = globalExercisePool.find(e => e.id === exId);
@@ -532,32 +531,70 @@
       document.getElementById("detailExPageTitle").innerText = ex.name;
       document.getElementById("detailExPageMuscle").innerText = ex.muscle;
 
-      // Özel Notu Yükle
       const note = localStorage.getItem(`fit_note_${exId}`) || "";
       document.getElementById("detailExNoteInput").value = note;
 
-      // Geçmiş Listesi
+      // GEÇMİŞİ GÜNLERE GÖRE GRUPLA
       const hist = getHistory(exId);
       const histContainer = document.getElementById("detailExHistoryList");
       histContainer.innerHTML = "";
 
       if (hist.length === 0) {
-        histContainer.innerHTML = `<p class="text-zinc-600 text-xs py-4 text-center font-medium bg-zinc-950 border border-zinc-900 rounded-2xl">Henüz tamamlanan set kaydı yok.</p>`;
+        histContainer.innerHTML = `<p class="text-zinc-600 text-xs py-4 text-center font-medium bg-zinc-950 border border-zinc-800/80 rounded-2xl">Henüz tamamlanan set kaydı yok.</p>`;
       } else {
-        [...hist].reverse().forEach(h => {
-          const row = document.createElement("div");
-          row.className = "flex justify-between items-center bg-zinc-950 border border-zinc-900 p-3 rounded-2xl text-[11px] font-num";
-          row.innerHTML = `
-            <span class="text-zinc-500 font-medium">${h.date}</span>
-            <span class="font-bold text-white text-xs">${h.kg} KG</span>
-            <span class="text-zinc-400 font-medium">${h.reps} Rep</span>
-            <span class="${h.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-extrabold">[${h.type}]</span>
+        // Tarihe göre grupla (Örn: "28 Eyl": [set1, set2])
+        const grouped = {};
+        hist.forEach(item => {
+          if (!grouped[item.date]) grouped[item.date] = [];
+          grouped[item.date].push(item);
+        });
+
+        // Günleri tersten diz (En yeni gün en üstte)
+        const days = Object.keys(grouped).reverse();
+
+        days.forEach((day, dIdx) => {
+          const daySets = grouped[day];
+          const lastSet = daySets[daySets.length - 1]; // O günkü son/en güncel set
+
+          const groupCard = document.createElement("div");
+          groupCard.className = "bg-zinc-950 border border-zinc-800/80 rounded-2xl overflow-hidden transition";
+
+          // Kapalı Başlık (Son Set Özeti)
+          let subSetsRows = "";
+          daySets.forEach((s, sIdx) => {
+            subSetsRows += `
+              <div class="flex justify-between items-center py-1.5 border-b border-zinc-850/60 last:border-b-0 text-[11px] font-num">
+                <span class="text-zinc-500 font-bold">${s.setNumber || sIdx + 1}. Set</span>
+                <span class="font-extrabold text-white">${s.kg} KG</span>
+                <span class="text-zinc-400 font-medium">${s.reps} Rep</span>
+                <span class="${s.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${s.type}]</span>
+              </div>
+            `;
+          });
+
+          groupCard.innerHTML = `
+            <div class="p-3.5 flex justify-between items-center cursor-pointer tap-press" onclick="toggleDayDetails('day_${dIdx}', this)">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-white font-num">${day}</span>
+                  <span class="text-[10px] text-zinc-500 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded font-num">${daySets.length} Set</span>
+                </div>
+                <p class="text-[11px] text-zinc-400 font-num mt-1">Son Set: <span class="text-blue-400 font-bold">${lastSet.kg} KG</span> × ${lastSet.reps} Rep <span class="text-rose-400">[${lastSet.type}]</span></p>
+              </div>
+              <span class="text-zinc-500 text-xs font-mono transition-transform duration-200" id="arrow_day_${dIdx}">▼</span>
+            </div>
+
+            <!-- Tıklayınca Açılan Diğer Setler -->
+            <div id="day_${dIdx}" class="hidden px-3.5 pb-3 pt-1 border-t border-zinc-850 bg-black/50">
+              <span class="text-[9px] text-zinc-500 font-bold uppercase tracking-wider block mb-1">O Günün Tüm Setleri</span>
+              ${subSetsRows}
+            </div>
           `;
-          histContainer.appendChild(row);
+          histContainer.appendChild(groupCard);
         });
       }
 
-      // Kademeli Ağırlık Artış Çizgisi (Chart.js)
+      // Kademeli Ağırlık Artış Çizgisi
       const ctx = document.getElementById('detailProgressionChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
@@ -594,12 +631,23 @@
         }
       });
 
-      // Sayfa Geçişi
       document.getElementById("viewWorkout").classList.add("hidden");
       const vDetail = document.getElementById("viewExerciseDetail");
       vDetail.classList.remove("hidden");
       vDetail.classList.remove("anim-back");
       vDetail.classList.add("anim-forward");
+    }
+
+    function toggleDayDetails(elId, headerEl) {
+      const detailsEl = document.getElementById(elId);
+      const arrowEl = document.getElementById(`arrow_${elId}`);
+      if (detailsEl.classList.contains("hidden")) {
+        detailsEl.classList.remove("hidden");
+        arrowEl.style.transform = "rotate(180deg)";
+      } else {
+        detailsEl.classList.add("hidden");
+        arrowEl.style.transform = "rotate(0deg)";
+      }
     }
 
     function closeExerciseDetail() {
@@ -641,14 +689,14 @@
       globalExercisePool.forEach(ex => {
         const isSelected = tempSelectedExerciseIds.includes(ex.id);
         const item = document.createElement("div");
-        item.className = `tap-press flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer ${isSelected ? 'bg-blue-600/10 border-blue-500/50 shadow-md' : 'bg-black border-zinc-900'}`;
+        item.className = `tap-press flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer ${isSelected ? 'bg-blue-600/10 border-blue-500/50 shadow-md' : 'bg-black border-zinc-800/80'}`;
         item.onclick = () => toggleTempSelection(ex.id);
         item.innerHTML = `
           <div>
             <p class="font-extrabold text-white text-xs tracking-tight">${ex.name}</p>
             <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
           </div>
-          <div class="w-7 h-7 rounded-xl flex items-center justify-center font-extrabold text-xs transition ${isSelected ? 'bg-blue-600 text-white' : 'bg-zinc-900 text-zinc-600'}">
+          <div class="w-7 h-7 rounded-xl flex items-center justify-center font-extrabold text-xs transition ${isSelected ? 'bg-blue-600 text-white shadow-sm' : 'bg-zinc-900 border border-zinc-800 text-zinc-600'}">
             ${isSelected ? '✓' : '+'}
           </div>
         `;
@@ -701,7 +749,6 @@
       renderPickerList();
     }
 
-    // Başlangıç: Ana Sayfa
     goHome();
   </script>
 </body>
