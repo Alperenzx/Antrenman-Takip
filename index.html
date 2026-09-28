@@ -38,6 +38,7 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
       letter-spacing: -0.015em;
+      overflow-x: hidden;
     }
     .font-num {
       font-family: 'JetBrains Mono', monospace;
@@ -48,13 +49,13 @@
       touch-action: none;
     }
 
-    /* Akıcı Animasyonlar */
+    /* Animasyonlar */
     @keyframes pageSlideIn {
-      from { opacity: 0; transform: translateX(20px); }
+      from { opacity: 0; transform: translateX(24px); }
       to { opacity: 1; transform: translateX(0); }
     }
     @keyframes pageSlideBack {
-      from { opacity: 0; transform: translateX(-20px); }
+      from { opacity: 0; transform: translateX(-24px); }
       to { opacity: 1; transform: translateX(0); }
     }
     @keyframes cardFadeInUp {
@@ -79,16 +80,6 @@
       100% { transform: rotate(-0.8deg); }
     }
 
-    /* Yer değiştirme hafif yaylanma animasyonları */
-    @keyframes slideSwapUp {
-      0% { transform: translateY(24px); opacity: 0.7; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes slideSwapDown {
-      0% { transform: translateY(-24px); opacity: 0.7; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-
     .anim-forward { animation: pageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-back { animation: pageSlideBack 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-card { animation: cardFadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -96,9 +87,13 @@
     .anim-sheet { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
     .wiggle { animation: wiggleEffect 0.24s ease-in-out infinite; }
-    
-    .anim-swap-up { animation: slideSwapUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .anim-swap-down { animation: slideSwapDown 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Belirgin yer değiştirme parlaması */
+    .swap-highlight {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.35) !important;
+      z-index: 10;
+    }
 
     .tap-press {
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -114,12 +109,19 @@
       right: 20px !important;
       z-index: 9999 !important;
     }
+
+    /* iOS Swipe-Back Gövde Katmanı */
+    .swipeable-view {
+      will-change: transform;
+      background-color: #000000;
+      min-height: 100vh;
+    }
   </style>
 </head>
 <body class="min-h-screen pb-32 antialiased">
 
-  <!-- ================= SAYFA 1: ANA SAYFA (PROGRAMLAR) ================= -->
-  <div id="viewHome" class="px-4 max-w-md mx-auto">
+  <!-- ================= SAYFA 1: ANA SAYFA ================= -->
+  <div id="viewHome" class="swipeable-view px-4 max-w-md mx-auto">
     <header class="py-5 border-b border-zinc-800/80 flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-black tracking-tight text-white">Programlar</h1>
@@ -133,7 +135,8 @@
     <div id="routineCardList" class="mt-4 space-y-3"></div>
   </div>
 
-  <!-- EKRANIN EN SAĞ ALTINA SABİTLENMİŞ BAĞIMSIZ BALONCUK -->
+
+  <!-- EKRANIN EN SAĞ ALTINA SABİTLENMİŞ BALONCUK -->
   <div id="floatingExerciseBubble" class="screen-fab-fixed">
     <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900 border border-zinc-700 hover:border-blue-500 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl active:scale-90">
       <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -148,8 +151,9 @@
     </button>
   </div>
 
+
   <!-- ================= SAYFA 2: AKTİF ANTRENMAN EKRANI ================= -->
-  <div id="viewWorkout" class="hidden px-3 max-w-md mx-auto">
+  <div id="viewWorkout" class="swipeable-view hidden px-3 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <div class="flex items-center gap-2.5">
         <button onclick="goHome()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -179,8 +183,9 @@
     </div>
   </div>
 
+
   <!-- ================= SAYFA 3: TÜM EGZERSİZLER HAVUZU ================= -->
-  <div id="viewLibrary" class="hidden px-4 max-w-md mx-auto">
+  <div id="viewLibrary" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-4 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <div class="flex items-center gap-2.5">
         <button onclick="closeLibraryPage()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -206,8 +211,9 @@
     <div id="libraryListContainer" class="mt-3 space-y-2.5 mb-8"></div>
   </div>
 
+
   <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI ================= -->
-  <div id="viewLibraryDetail" class="hidden px-4 max-w-md mx-auto">
+  <div id="viewLibraryDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeLibraryDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
         ←
@@ -249,8 +255,9 @@
     </section>
   </div>
 
+
   <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI ================= -->
-  <div id="viewWorkoutExerciseDetail" class="hidden px-4 max-w-md mx-auto">
+  <div id="viewWorkoutExerciseDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeWorkoutExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
         ←
@@ -293,6 +300,7 @@
     </section>
   </div>
 
+
   <!-- ================= POPUPLAR ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
     <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
@@ -324,7 +332,7 @@
       <input id="newExMuscleInput" type="text" placeholder="Bölge (Göğüs, Omuz, Sırt, Kol)" class="w-full bg-black border border-zinc-800/80 focus:border-blue-500/60 rounded-2xl p-3.5 text-center text-xs text-white focus:outline-none mb-5 transition font-semibold">
 
       <div class="flex gap-2.5">
-        <button onclick="closeNewExerciseModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-400 font-bold text-xs">İptal</button>
+        <button onclick="closeNewExerciseModal()" class="tap-press flex-1 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold text-xs">İptal</button>
         <button onclick="submitNewExercise()" class="tap-press flex-1 py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/25 border border-blue-500/30">Havuza Ekle</button>
       </div>
     </div>
@@ -358,7 +366,6 @@
 
 
   <script>
-    // İSTEDİĞİN GÜNCEL STANDART HAREKET LİSTESİ
     const defaultExercisePool = [
       { id: "bp", name: "Bench Press", muscle: "Göğüs" },
       { id: "cf", name: "Chest Fly", muscle: "Göğüs" },
@@ -370,15 +377,11 @@
       { id: "bcc", name: "Back Curl (Cable)", muscle: "Biceps" }
     ];
 
-    // Yerel depodaki havuzu yeni listeyle birleştir/güncelle
     let savedPool = JSON.parse(localStorage.getItem("fit_pool")) || [];
     defaultExercisePool.forEach(defEx => {
       const exists = savedPool.some(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
-      if (!exists) {
-        savedPool.push(defEx);
-      }
+      if (!exists) savedPool.push(defEx);
     });
-    // Eğer havuz sıfırsa doğrudan varsayılanı ata
     if (savedPool.length === 0) savedPool = [...defaultExercisePool];
     localStorage.setItem("fit_pool", JSON.stringify(savedPool));
 
@@ -392,10 +395,6 @@
     let isReorderingRoutine = false;
     let isReorderingLibrary = false;
     let longPressTimer = null;
-
-    // Yer değiştirirken anlık animasyon tetiklemek için tutulan id'ler
-    let animatedMoveExId = null;
-    let animatedMoveDirection = null; // 'up' veya 'down'
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
@@ -447,6 +446,100 @@
       }
     }
 
+    // ================= APPLE STANDARTLARINDA SOLDAN SAĞA SWIPE-TO-BACK MOTORU =================
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isSwipingBack = false;
+    let activeSwipeElement = null;
+
+    function getActiveSubView() {
+      if (!document.getElementById("viewWorkoutExerciseDetail").classList.contains("hidden")) {
+        return { el: document.getElementById("viewWorkoutExerciseDetail"), backFn: closeWorkoutExerciseDetail };
+      }
+      if (!document.getElementById("viewLibraryDetail").classList.contains("hidden")) {
+        return { el: document.getElementById("viewLibraryDetail"), backFn: closeLibraryDetail };
+      }
+      if (!document.getElementById("viewWorkout").classList.contains("hidden")) {
+        return { el: document.getElementById("viewWorkout"), backFn: goHome };
+      }
+      if (!document.getElementById("viewLibrary").classList.contains("hidden")) {
+        return { el: document.getElementById("viewLibrary"), backFn: closeLibraryPage };
+      }
+      return null;
+    }
+
+    window.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      const x = e.touches[0].clientX;
+      const y = e.touches[0].clientY;
+      
+      // Ekranın en solundan (ilk 38px) başlayan dokunuşları yakala
+      if (x <= 38) {
+        const active = getActiveSubView();
+        if (active) {
+          touchStartX = x;
+          touchStartY = y;
+          isSwipingBack = true;
+          activeSwipeElement = active.el;
+          activeSwipeElement.style.transition = "none";
+        }
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+      if (!isSwipingBack || !activeSwipeElement) return;
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const deltaX = currentX - touchStartX;
+      const deltaY = Math.abs(currentY - touchStartY);
+
+      // Yatay hareket dikeyden belirginse sayfayı parmakla birlikte kaydır
+      if (deltaX > 0 && deltaX > deltaY) {
+        activeSwipeElement.style.transform = `translateX(${deltaX}px)`;
+        // Arka planı hafif şeffaflaştırarak derinlik ver
+        activeSwipeElement.style.boxShadow = `-10px 0 25px rgba(0,0,0,0.8)`;
+      }
+    }, { passive: true });
+
+    window.addEventListener("touchend", (e) => {
+      if (!isSwipingBack || !activeSwipeElement) return;
+      isSwipingBack = false;
+      const currentX = e.changedTouches[0].clientX;
+      const deltaX = currentX - touchStartX;
+      const active = getActiveSubView();
+
+      activeSwipeElement.style.transition = "transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease";
+
+      // 80 pikselden fazla çekildiyse kapat, yoksa geri yerine yaylandır
+      if (deltaX > 80 && active) {
+        activeSwipeElement.style.transform = `translateX(100%)`;
+        setTimeout(() => {
+          activeSwipeElement.style.transform = "";
+          activeSwipeElement.style.boxShadow = "";
+          active.backFn();
+        }, 220);
+      } else {
+        activeSwipeElement.style.transform = `translateX(0)`;
+        setTimeout(() => {
+          if (activeSwipeElement) {
+            activeSwipeElement.style.transform = "";
+            activeSwipeElement.style.boxShadow = "";
+          }
+        }, 240);
+      }
+      activeSwipeElement = null;
+    });
+
+    // Browser Geçmişi Desteği (iOS Donanımsal Geri Desteği)
+    window.addEventListener("popstate", () => {
+      const active = getActiveSubView();
+      if (active) active.backFn();
+    });
+
+    function pushHistoryState(pageName) {
+      history.pushState({ page: pageName }, "");
+    }
+
     // --- SAYFA GEÇİŞLERİ ---
     function goHome() {
       currentRoutineId = null;
@@ -467,6 +560,7 @@
     function openWorkout(routineId) {
       currentRoutineId = routineId;
       isReorderingRoutine = false;
+      pushHistoryState("workout");
       document.getElementById("viewHome").classList.add("hidden");
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
@@ -512,7 +606,6 @@
       });
     }
 
-    // --- PROGRAM MODALI ---
     function openNewRoutineModal() {
       const modal = document.getElementById("newRoutineModal");
       const input = document.getElementById("newRoutineInput");
@@ -551,7 +644,7 @@
       }
     }
 
-    // --- ANTRENMAN MODU (SIRALAMA ANİMASYONLU) ---
+    // --- ANTRENMAN MODU ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -588,14 +681,9 @@
         const hist = getHistory(exId);
         const lastRec = hist[hist.length - 1];
 
-        // Kartın kayma animasyon sınıfını belirle
-        let moveAnimClass = "";
-        if (animatedMoveExId === exId) {
-          moveAnimClass = animatedMoveDirection === 'up' ? 'anim-swap-up' : 'anim-swap-down';
-        }
-
         const card = document.createElement("div");
-        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''} ${moveAnimClass}`;
+        card.id = `routine_card_${exId}`;
+        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition-all duration-300 ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
 
         attachLongPress(card, () => {
@@ -636,9 +724,9 @@
 
             ${isReorderingRoutine ? `
               <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="moveRoutineExercise(${exIndex}, -1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
-                <button onclick="moveRoutineExercise(${exIndex}, 1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
-                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
+                <button onclick="animateAndMoveRoutine(${exIndex}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-75 transition flex items-center justify-center">▲</button>
+                <button onclick="animateAndMoveRoutine(${exIndex}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-75 transition flex items-center justify-center">▼</button>
+                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-75 ml-1 flex items-center justify-center">🗑️</button>
               </div>
             ` : ''}
           </div>
@@ -661,27 +749,70 @@
         `;
         container.appendChild(card);
       });
-
-      // Animasyon tetiklendikten sonra temizle
-      animatedMoveExId = null;
-      animatedMoveDirection = null;
     }
 
-    function moveRoutineExercise(index, direction, exId) {
+    // FLIP METODUYLA BELİRGİN YER DEĞİŞTİRME ANİMASYONU
+    function animateAndMoveRoutine(index, direction) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return;
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= routine.exerciseIds.length) return;
 
-      const temp = routine.exerciseIds[index];
-      routine.exerciseIds[index] = routine.exerciseIds[targetIndex];
-      routine.exerciseIds[targetIndex] = temp;
+      const currentExId = routine.exerciseIds[index];
+      const targetExId = routine.exerciseIds[targetIndex];
 
-      animatedMoveExId = exId;
-      animatedMoveDirection = direction === -1 ? 'up' : 'down';
+      const currentCard = document.getElementById(`routine_card_${currentExId}`);
+      const targetCard = document.getElementById(`routine_card_${targetExId}`);
 
-      saveRoutines();
-      renderWorkout(false);
+      if (currentCard && targetCard) {
+        const firstCurrentRect = currentCard.getBoundingClientRect();
+        const firstTargetRect = targetCard.getBoundingClientRect();
+
+        // Diziyi güncelle
+        const temp = routine.exerciseIds[index];
+        routine.exerciseIds[index] = routine.exerciseIds[targetIndex];
+        routine.exerciseIds[targetIndex] = temp;
+        saveRoutines();
+
+        renderWorkout(false);
+
+        const newCurrentCard = document.getElementById(`routine_card_${currentExId}`);
+        const newTargetCard = document.getElementById(`routine_card_${targetExId}`);
+
+        if (newCurrentCard && newTargetCard) {
+          const lastCurrentRect = newCurrentCard.getBoundingClientRect();
+          const lastTargetRect = newTargetCard.getBoundingClientRect();
+
+          const invertCurrentY = firstCurrentRect.top - lastCurrentRect.top;
+          const invertTargetY = firstTargetRect.top - lastTargetRect.top;
+
+          // Başlangıç konumuna çek
+          newCurrentCard.style.transform = `translateY(${invertCurrentY}px) scale(1.02)`;
+          newCurrentCard.style.transition = 'none';
+          newCurrentCard.classList.add('swap-highlight');
+
+          newTargetCard.style.transform = `translateY(${invertTargetY}px)`;
+          newTargetCard.style.transition = 'none';
+
+          // Reflow zorla
+          newCurrentCard.offsetHeight;
+
+          // Akıcı ve belirgin geçişle yerine oturt
+          newCurrentCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.32s ease';
+          newTargetCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          newCurrentCard.style.transform = 'translateY(0) scale(1)';
+          newTargetCard.style.transform = 'translateY(0)';
+
+          setTimeout(() => {
+            newCurrentCard.classList.remove('swap-highlight');
+            newCurrentCard.style.transform = '';
+            newTargetCard.style.transform = '';
+            newCurrentCard.style.transition = '';
+            newTargetCard.style.transition = '';
+          }, 340);
+        }
+      }
     }
 
     function updateSetVal(exId, idx, field, val) {
@@ -744,6 +875,7 @@
 
     // --- TÜM EGZERSİZ HAVUZU / KÜTÜPHANE SAYFASI ---
     function openLibraryPage() {
+      pushHistoryState("library");
       document.getElementById("viewHome").classList.add("hidden");
       document.getElementById("viewWorkout").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
@@ -785,13 +917,9 @@
         const hist = getHistory(ex.id);
         const maxKg = getMaxKg(hist);
 
-        let moveAnimClass = "";
-        if (animatedMoveExId === ex.id) {
-          moveAnimClass = animatedMoveDirection === 'up' ? 'anim-swap-up' : 'anim-swap-down';
-        }
-
         const card = document.createElement("div");
-        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md transition ${isReorderingLibrary ? 'wiggle border-blue-500/50' : ''} ${moveAnimClass}`;
+        card.id = `lib_card_${ex.id}`;
+        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md transition-all duration-300 ${isReorderingLibrary ? 'wiggle border-blue-500/50' : ''}`;
         card.style.animationDelay = `${idx * 20}ms`;
 
         attachLongPress(card, () => {
@@ -810,9 +938,9 @@
           
           ${isReorderingLibrary ? `
             <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-              <button onclick="moveLibraryExercise(${idx}, -1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
-              <button onclick="moveLibraryExercise(${idx}, 1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
-              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
+              <button onclick="animateAndMoveLibrary(${idx}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-75 transition flex items-center justify-center">▲</button>
+              <button onclick="animateAndMoveLibrary(${idx}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-75 transition flex items-center justify-center">▼</button>
+              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-75 ml-1 flex items-center justify-center">🗑️</button>
             </div>
           ` : `
             <div class="text-right font-num">
@@ -823,24 +951,63 @@
         `;
         container.appendChild(card);
       });
-
-      animatedMoveExId = null;
-      animatedMoveDirection = null;
     }
 
-    function moveLibraryExercise(index, direction, exId) {
+    function animateAndMoveLibrary(index, direction) {
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= globalExercisePool.length) return;
 
-      const temp = globalExercisePool[index];
-      globalExercisePool[index] = globalExercisePool[targetIndex];
-      globalExercisePool[targetIndex] = temp;
+      const currentExId = globalExercisePool[index].id;
+      const targetExId = globalExercisePool[targetIndex].id;
 
-      animatedMoveExId = exId;
-      animatedMoveDirection = direction === -1 ? 'up' : 'down';
+      const currentCard = document.getElementById(`lib_card_${currentExId}`);
+      const targetCard = document.getElementById(`lib_card_${targetExId}`);
 
-      savePool();
-      renderLibrary();
+      if (currentCard && targetCard) {
+        const firstCurrentRect = currentCard.getBoundingClientRect();
+        const firstTargetRect = targetCard.getBoundingClientRect();
+
+        const temp = globalExercisePool[index];
+        globalExercisePool[index] = globalExercisePool[targetIndex];
+        globalExercisePool[targetIndex] = temp;
+        savePool();
+
+        renderLibrary();
+
+        const newCurrentCard = document.getElementById(`lib_card_${currentExId}`);
+        const newTargetCard = document.getElementById(`lib_card_${targetExId}`);
+
+        if (newCurrentCard && newTargetCard) {
+          const lastCurrentRect = newCurrentCard.getBoundingClientRect();
+          const lastTargetRect = newTargetCard.getBoundingClientRect();
+
+          const invertCurrentY = firstCurrentRect.top - lastCurrentRect.top;
+          const invertTargetY = firstTargetRect.top - lastTargetRect.top;
+
+          newCurrentCard.style.transform = `translateY(${invertCurrentY}px) scale(1.02)`;
+          newCurrentCard.style.transition = 'none';
+          newCurrentCard.classList.add('swap-highlight');
+
+          newTargetCard.style.transform = `translateY(${invertTargetY}px)`;
+          newTargetCard.style.transition = 'none';
+
+          newCurrentCard.offsetHeight;
+
+          newCurrentCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.32s ease';
+          newTargetCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
+
+          newCurrentCard.style.transform = 'translateY(0) scale(1)';
+          newTargetCard.style.transform = 'translateY(0)';
+
+          setTimeout(() => {
+            newCurrentCard.classList.remove('swap-highlight');
+            newCurrentCard.style.transform = '';
+            newTargetCard.style.transform = '';
+            newCurrentCard.style.transition = '';
+            newTargetCard.style.transition = '';
+          }, 340);
+        }
+      }
     }
 
     function deleteGlobalExercise(exId) {
@@ -856,6 +1023,7 @@
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
 
+      pushHistoryState("libraryDetail");
       document.getElementById("libDetailExTitle").innerText = ex.name;
       document.getElementById("libDetailExMuscle").innerText = ex.muscle;
 
@@ -890,6 +1058,7 @@
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
 
+      pushHistoryState("workoutDetail");
       document.getElementById("workoutExDetailTitle").innerText = ex.name;
       document.getElementById("workoutExDetailMuscle").innerText = ex.muscle;
 
