@@ -35,7 +35,10 @@
         <h1 id="currentRoutineName" class="text-lg font-bold text-white tracking-tight">Program Seçilmedi</h1>
         <button onclick="createNewRoutine()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-2.5 py-1 rounded-lg active:scale-95 transition">+ Yeni Program</button>
       </div>
-      <span id="completedCounter" class="text-[11px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 Set</span>
+      <div class="flex items-center gap-1.5">
+        <span id="completedCounter" class="text-[11px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 Set</span>
+        <button onclick="resetAllData()" title="Hafızayı Sıfırla" class="text-[10px] text-zinc-500 hover:text-rose-400 p-1">🗑️</button>
+      </div>
     </div>
 
     <!-- Rutin Sekmeleri -->
@@ -44,60 +47,44 @@
 
   <div class="w-full max-w-md mx-auto px-3">
 
-    <!-- Standart Açık/Beyaz Zeminli Anatomi Kas Kartı -->
-    <section class="mt-3 bg-white text-zinc-900 rounded-2xl p-3.5 shadow-xl border border-zinc-200">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-[10px] font-bold tracking-wider text-zinc-500 uppercase">HEDEF KAS ANATOMİSİ</span>
-        <span class="text-[10px] font-semibold text-blue-600 font-mono" id="activeMuscleLabel">Hazır</span>
+    <!-- Standart Anatomik Kas Modeli Kartı -->
+    <section class="mt-3 bg-white text-zinc-900 rounded-2xl p-4 shadow-xl border border-zinc-200">
+      <div class="flex justify-between items-center mb-3">
+        <span class="text-[10px] font-extrabold tracking-wider text-zinc-500 uppercase">HEDEF KAS ANATOMİSİ</span>
+        <span class="text-[10px] font-bold text-rose-600 font-mono" id="activeMuscleLabel">STANDART ANATOMİ</span>
       </div>
 
-      <!-- Standart Kas Figürü -->
-      <div class="flex justify-around items-center bg-zinc-50 border border-zinc-200/80 rounded-xl py-3 px-2">
-        <!-- Ön Gövde -->
-        <div class="flex flex-col items-center">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ÖN</span>
-          <svg class="w-24 h-36" viewBox="0 0 100 160">
-            <!-- Kafa & Boyun -->
-            <ellipse cx="50" cy="16" rx="9" ry="11" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <rect x="46" y="27" width="8" height="6" fill="#d4d4d8"/>
-            <!-- Omuzlar (Deltoid) -->
-            <path id="muscle-omuz-on" d="M26 36 Q38 30 50 33 Q62 30 74 36 L79 48 Q50 44 21 48 Z" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Göğüs (Pectoral) -->
-            <path id="muscle-gogus" d="M29 46 Q50 48 71 46 L69 66 Q50 70 31 66 Z" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Karın (Abdominal) -->
-            <path id="muscle-karin" d="M34 68 Q50 71 66 68 L63 98 Q50 101 37 98 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Kollar / Biceps -->
-            <rect id="muscle-biceps" x="14" y="50" width="8" height="24" rx="4" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <rect id="muscle-biceps-2" x="78" y="50" width="8" height="24" rx="4" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Ön Bacak (Quadriceps) -->
-            <path id="muscle-bacak-on" d="M36 100 L48 100 L46 150 L34 148 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <path id="muscle-bacak-on-2" d="M52 100 L64 100 L66 148 L54 150 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-          </svg>
+      <!-- Ön & Arka Vücut Anatomik Çizimi -->
+      <div class="flex justify-around items-center bg-zinc-50 border border-zinc-200 rounded-xl p-2 relative overflow-hidden">
+        
+        <!-- Ön Anatomi -->
+        <div class="flex flex-col items-center relative">
+          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ÖN GÖVDE</span>
+          <div class="relative w-28 h-48 flex items-center justify-center">
+            <!-- Temel Kaslı Vücut Katmanı -->
+            <img id="frontBodyImg" src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507693998816-4N72U4O3FOPW6R91P896/male-muscles-front.png" 
+                 onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png';" 
+                 class="w-full h-full object-contain filter grayscale contrast-125 transition-all duration-300" alt="Ön Kas Anatomisi">
+            <!-- Aktif Kırmızı Vurgu Efekti -->
+            <div id="frontHighlight" class="absolute inset-0 pointer-events-none mix-blend-multiply opacity-0 transition-opacity duration-300 bg-rose-500/30 rounded-lg"></div>
+          </div>
         </div>
 
-        <!-- Arka Gövde -->
-        <div class="flex flex-col items-center border-l border-zinc-200 pl-4">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ARKA</span>
-          <svg class="w-24 h-36" viewBox="0 0 100 160">
-            <!-- Kafa -->
-            <ellipse cx="50" cy="16" rx="9" ry="11" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <rect x="46" y="27" width="8" height="6" fill="#d4d4d8"/>
-            <!-- Sırt & Kanat (Lat / Trapez) -->
-            <path id="muscle-sirt" d="M28 35 Q50 40 72 35 L76 72 Q50 76 24 72 Z" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Triceps -->
-            <rect id="muscle-triceps" x="13" y="47" width="8" height="24" rx="4" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <rect id="muscle-triceps-2" x="79" y="47" width="8" height="24" rx="4" fill="#d4d4d8" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Bel / Glute -->
-            <path d="M34 74 Q50 76 66 74 L64 99 Q50 102 36 99 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <!-- Arka Bacak (Hamstring / Calves) -->
-            <path id="muscle-bacak-arka" d="M35 101 L48 101 L46 150 L33 148 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-            <path id="muscle-bacak-arka-2" d="M52 101 L65 101 L67 148 L54 150 Z" fill="#e4e4e7" stroke="#a1a1aa" stroke-width="1"/>
-          </svg>
+        <!-- Arka Anatomi -->
+        <div class="flex flex-col items-center border-l border-zinc-200 pl-4 relative">
+          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ARKA GÖVDE</span>
+          <div class="relative w-28 h-48 flex items-center justify-center">
+            <img id="backBodyImg" src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507694000302-36I1P6P085P7J68U9W36/male-muscles-back.png" 
+                 onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3043/3043890.png';" 
+                 class="w-full h-full object-contain filter grayscale contrast-125 transition-all duration-300" alt="Arka Kas Anatomisi">
+            <div id="backHighlight" class="absolute inset-0 pointer-events-none mix-blend-multiply opacity-0 transition-opacity duration-300 bg-rose-500/30 rounded-lg"></div>
+          </div>
         </div>
+
       </div>
 
       <!-- Kas Sayaçları -->
-      <div class="grid grid-cols-4 gap-1.5 mt-2.5 text-center font-mono">
+      <div class="grid grid-cols-4 gap-1.5 mt-3 text-center font-mono">
         <div class="bg-zinc-100 border border-zinc-200 p-1.5 rounded-lg">
           <span class="block text-[8px] text-zinc-500 font-sans font-bold">GÖĞÜS</span>
           <span id="cnt-gogus" class="text-xs font-bold text-zinc-800">0 Set</span>
@@ -169,7 +156,6 @@
   </div>
 
   <script>
-    // Temel Egzersiz Havuzu (Kullanıcı yeni hareket ekledikçe buraya da kaydedilir)
     let globalExercisePool = JSON.parse(localStorage.getItem("fit_pool")) || [
       { id: "sp", name: "Shoulder Press", muscle: "Omuz", tag: "omuz" },
       { id: "clr", name: "Cable Lateral Raise", muscle: "Omuz", tag: "omuz" },
@@ -177,14 +163,20 @@
       { id: "cf", name: "Cable Fly", muscle: "Göğüs", tag: "gogus" },
       { id: "scr", name: "Seated Cable Row", muscle: "Sırt", tag: "sirt" },
       { id: "lp", name: "Lat Pulldown", muscle: "Sırt", tag: "sirt" },
-      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Triceps", tag: "triceps" },
-      { id: "btk", name: "Biceps Tek Kol", muscle: "Biceps", tag: "biceps" }
+      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Triceps", tag: "kol" },
+      { id: "btk", name: "Biceps Tek Kol", muscle: "Biceps", tag: "kol" }
     ];
 
-    // Rutinler: Başlangıçta boş başlar, kullanıcı kendi programını ekler
     let routines = JSON.parse(localStorage.getItem("fit_routines")) || [];
     let currentRoutineId = localStorage.getItem("fit_current_routine") || (routines[0] ? routines[0].id : null);
     let chartInstance = null;
+
+    function resetAllData() {
+      if (confirm("Tüm kayıtları ve programları sıfırlayıp tertemiz boş ekrana dönmek istiyor musun?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
 
     function savePool() {
       localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool));
@@ -265,7 +257,7 @@
       const name = prompt("Yeni Hareketin Adı (Örn: Incline Dumbbell Press):");
       if (!name || !name.trim()) return;
 
-      const region = prompt("Hangi kas bölgesi? (gogus, omuz, sirt, biceps, triceps, bacak yazabilirsin):", "gogus");
+      const region = prompt("Kas bölgesi? (gogus, omuz, sirt, kol yazabilirsin):", "gogus");
       const tag = region ? region.trim().toLowerCase() : "gogus";
 
       const newEx = {
@@ -278,7 +270,6 @@
       globalExercisePool.push(newEx);
       savePool();
 
-      // Açık bir rutin varsa doğrudan ona da ekle
       if (currentRoutineId) {
         const current = routines.find(r => r.id === currentRoutineId);
         if (current && !current.exerciseIds.includes(newEx.id)) {
@@ -501,7 +492,7 @@
               if (ex.tag === "gogus") muscleCounts.gogus++;
               if (ex.tag === "omuz") muscleCounts.omuz++;
               if (ex.tag === "sirt") muscleCounts.sirt++;
-              if (ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
+              if (ex.tag === "kol" || ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
             }
           });
         });
@@ -513,21 +504,31 @@
       document.getElementById("cnt-sirt").innerText = `${muscleCounts.sirt} Set`;
       document.getElementById("cnt-kol").innerText = `${muscleCounts.kol} Set`;
 
-      // Standart Beyaz Kart Anatomisinde Kasları Maviyle Parlat
-      const activeColor = "#2563eb";
-      const passiveColor = "#d4d4d8";
+      // Anatomik Resimde Kırmızı Parlama Efekti
+      const frontActive = (muscleCounts.gogus > 0 || muscleCounts.omuz > 0);
+      const backActive = (muscleCounts.sirt > 0 || muscleCounts.kol > 0);
 
-      document.getElementById("muscle-gogus").setAttribute("fill", muscleCounts.gogus > 0 ? activeColor : passiveColor);
-      document.getElementById("muscle-omuz-on").setAttribute("fill", muscleCounts.omuz > 0 ? activeColor : passiveColor);
-      document.getElementById("muscle-sirt").setAttribute("fill", muscleCounts.sirt > 0 ? activeColor : passiveColor);
+      document.getElementById("frontHighlight").style.opacity = frontActive ? "1" : "0";
+      document.getElementById("backHighlight").style.opacity = backActive ? "1" : "0";
 
-      const bicepsActive = (activeSets["btk"] || []).some(s => s.done);
-      document.getElementById("muscle-biceps").setAttribute("fill", bicepsActive ? activeColor : passiveColor);
-      document.getElementById("muscle-biceps-2").setAttribute("fill", bicepsActive ? activeColor : passiveColor);
+      const frontImg = document.getElementById("frontBodyImg");
+      const backImg = document.getElementById("backBodyImg");
 
-      const tricepsActive = (activeSets["tb"] || []).some(s => s.done);
-      document.getElementById("muscle-triceps").setAttribute("fill", tricepsActive ? activeColor : passiveColor);
-      document.getElementById("muscle-triceps-2").setAttribute("fill", tricepsActive ? activeColor : passiveColor);
+      if (frontActive) {
+        frontImg.classList.remove("grayscale");
+        frontImg.classList.add("sepia", "hue-rotate-[320deg]");
+      } else {
+        frontImg.classList.add("grayscale");
+        frontImg.classList.remove("sepia", "hue-rotate-[320deg]");
+      }
+
+      if (backActive) {
+        backImg.classList.remove("grayscale");
+        backImg.classList.add("sepia", "hue-rotate-[320deg]");
+      } else {
+        backImg.classList.add("grayscale");
+        backImg.classList.remove("sepia", "hue-rotate-[320deg]");
+      }
     }
 
     function openDetailModal(exId) {
@@ -585,7 +586,7 @@
           plugins: { legend: { display: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 9 } } },
-            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 9 } } }
+            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 10 } } }
           }
         }
       });
