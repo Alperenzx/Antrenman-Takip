@@ -11,16 +11,83 @@
 </head>
 <body class="bg-black text-zinc-100 min-h-screen pb-28 font-sans select-none">
 
-  <!-- Üst Başlık & Özet -->
+  <!-- Üst Bar -->
   <header class="p-4 pt-6 border-b border-zinc-900 sticky top-0 bg-black/95 backdrop-blur-md z-40 flex justify-between items-center">
     <div>
       <h1 class="text-xl font-bold tracking-tight text-white">Upper Body</h1>
-      <p class="text-[11px] text-zinc-400">Omuz, Göğüs, Sırt, Kol Rutini</p>
+      <p class="text-[11px] text-zinc-400">Omuz, Göğüs, Sırt, Kol</p>
     </div>
     <div class="flex items-center gap-2">
-      <span id="completedCounter" class="text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-semibold">0 Set Tamam</span>
+      <span id="completedCounter" class="text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-semibold font-mono">0 Set Tamam</span>
     </div>
   </header>
+
+  <!-- Kas Haritası & Dağılım Kartı -->
+  <section class="max-w-lg mx-auto p-3">
+    <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-lg">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Hedef Kas Haritası</h2>
+        <span class="text-[10px] text-zinc-500">Set tamamlandıkça parlar</span>
+      </div>
+
+      <!-- Vücut Silüeti & Kas Göstergeleri (SVG Tabanlı) -->
+      <div class="grid grid-cols-2 gap-4 items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
+        <!-- Ön Vücut -->
+        <div class="flex flex-col items-center">
+          <span class="text-[10px] text-zinc-500 font-bold mb-1">ÖN GÖVDE</span>
+          <svg class="w-24 h-40" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
+            <!-- Kafa -->
+            <circle cx="50" cy="18" r="10" stroke="#3f3f46" fill="#18181b"/>
+            <!-- Omuzlar -->
+            <path id="muscle-omuz-on" d="M30 35 Q50 30 70 35 L76 48 Q50 44 24 48 Z" fill="#27272a" class="transition-colors duration-300"/>
+            <!-- Göğüs -->
+            <path id="muscle-gogus" d="M32 46 Q50 48 68 46 L66 65 Q50 68 34 65 Z" fill="#27272a" class="transition-colors duration-300"/>
+            <!-- Karın -->
+            <path d="M36 67 Q50 69 64 67 L61 95 Q50 97 39 95 Z" fill="#18181b"/>
+            <!-- Biceps (Ön Kol) -->
+            <rect id="muscle-biceps" x="18" y="52" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
+            <rect id="muscle-biceps-2" x="74" y="52" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
+          </svg>
+        </div>
+
+        <!-- Arka Vücut -->
+        <div class="flex flex-col items-center border-l border-zinc-800 pl-3">
+          <span class="text-[10px] text-zinc-500 font-bold mb-1">ARKA GÖVDE</span>
+          <svg class="w-24 h-40" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
+            <!-- Kafa -->
+            <circle cx="50" cy="18" r="10" stroke="#3f3f46" fill="#18181b"/>
+            <!-- Trapez / Üst Sırt -->
+            <path id="muscle-sirt" d="M32 35 Q50 40 68 35 L74 68 Q50 72 26 68 Z" fill="#27272a" class="transition-colors duration-300"/>
+            <!-- Triceps (Arka Kol) -->
+            <rect id="muscle-triceps" x="17" y="48" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
+            <rect id="muscle-triceps-2" x="75" y="48" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
+            <!-- Alt Sırt -->
+            <path d="M37 72 Q50 74 63 72 L60 95 Q50 97 40 95 Z" fill="#18181b"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Bölgesel Set Sayaçları -->
+      <div id="muscleTags" class="grid grid-cols-4 gap-1.5 mt-3 text-center font-mono">
+        <div class="bg-black/50 border border-zinc-800 p-1.5 rounded-lg">
+          <span class="block text-[9px] text-zinc-500">GÖĞÜS</span>
+          <span id="cnt-gogus" class="text-xs font-bold text-zinc-400">0 Set</span>
+        </div>
+        <div class="bg-black/50 border border-zinc-800 p-1.5 rounded-lg">
+          <span class="block text-[9px] text-zinc-500">OMUZ</span>
+          <span id="cnt-omuz" class="text-xs font-bold text-zinc-400">0 Set</span>
+        </div>
+        <div class="bg-black/50 border border-zinc-800 p-1.5 rounded-lg">
+          <span class="block text-[9px] text-zinc-500">SIRT</span>
+          <span id="cnt-sirt" class="text-xs font-bold text-zinc-400">0 Set</span>
+        </div>
+        <div class="bg-black/50 border border-zinc-800 p-1.5 rounded-lg">
+          <span class="block text-[9px] text-zinc-500">KOL</span>
+          <span id="cnt-kol" class="text-xs font-bold text-zinc-400">0 Set</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Egzersiz Listesi -->
   <main id="routineContainer" class="p-3 space-y-4 max-w-lg mx-auto"></main>
@@ -36,7 +103,7 @@
         <button onclick="closeDetailModal()" class="text-zinc-400 hover:text-white text-xl font-bold p-1">✕</button>
       </div>
 
-      <!-- YouTube Zaman Ayarlı Video Butonu -->
+      <!-- YouTube Zaman Ayarlı Video Linki -->
       <div id="videoContainer" class="mb-4">
         <a id="videoLink" href="#" target="_blank" class="flex items-center justify-between bg-zinc-800/80 border border-zinc-700 hover:border-blue-500 p-3 rounded-xl text-xs text-zinc-200 transition">
           <span class="flex items-center gap-2.5 font-medium">
@@ -61,21 +128,20 @@
   </div>
 
   <script>
-    // Ortak Egzersiz Havuzu (YouTube saniye ayarlı parametreler eklendi: &t=X)
+    // Ortak Egzersiz Havuzu (Kas grupları hedef kas haritası için etiketlendi)
     const exercisePool = [
-      { id: "sp", name: "Shoulder Press", muscle: "Omuz (Ön/Yan)", videoUrl: "https://www.youtube.com/watch?v=qEwKCR5JCog&t=45s", time: "00:45" },
-      { id: "clr", name: "Cable Lateral Raise", muscle: "Yan Omuz", videoUrl: "https://www.youtube.com/watch?v=PPrzBWZDOhA&t=30s", time: "00:30" },
-      { id: "bp", name: "Bench Press", muscle: "Göğüs, Ön Omuz, Triceps", videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg&t=60s", time: "01:00" },
-      { id: "cf", name: "Cable Fly", muscle: "İç / Orta Göğüs", videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o&t=20s", time: "00:20" },
-      { id: "scr", name: "Seated Cable Row", muscle: "Sırt, Lat, Rhomboid", videoUrl: "https://www.youtube.com/watch?v=GZbfZ033f74&t=15s", time: "00:15" },
-      { id: "lp", name: "Lat Pulldown", muscle: "Üst Sırt, Kanat", videoUrl: "https://www.youtube.com/watch?v=CAwf7n6Luuc&t=40s", time: "00:40" },
-      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Arka Kol (Uzun Baş)", videoUrl: "https://www.youtube.com/watch?v=b_Xhx2qS3oU&t=25s", time: "00:25" },
-      { id: "btk", name: "Biceps Tek Kol", muscle: "Ön Kol (Biceps)", videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo&t=10s", time: "00:10" }
+      { id: "sp", name: "Shoulder Press", muscle: "Omuz (Ön/Yan)", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=qEwKCR5JCog&t=45s", time: "00:45" },
+      { id: "clr", name: "Cable Lateral Raise", muscle: "Yan Omuz", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=PPrzBWZDOhA&t=30s", time: "00:30" },
+      { id: "bp", name: "Bench Press", muscle: "Göğüs, Ön Omuz, Triceps", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg&t=60s", time: "01:00" },
+      { id: "cf", name: "Cable Fly", muscle: "Göğüs", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o&t=20s", time: "00:20" },
+      { id: "scr", name: "Seated Cable Row", muscle: "Sırt, Lat, Rhomboid", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=GZbfZ033f74&t=15s", time: "00:15" },
+      { id: "lp", name: "Lat Pulldown", muscle: "Üst Sırt, Kanat", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=CAwf7n6Luuc&t=40s", time: "00:40" },
+      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Arka Kol (Triceps)", tag: "triceps", videoUrl: "https://www.youtube.com/watch?v=b_Xhx2qS3oU&t=25s", time: "00:25" },
+      { id: "btk", name: "Biceps Tek Kol", muscle: "Ön Kol (Biceps)", tag: "biceps", videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo&t=10s", time: "00:10" }
     ];
 
     let chartInstance = null;
 
-    // Veri Saklama Yardımcıları
     function getHistory(exId) {
       return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]");
     }
@@ -84,12 +150,11 @@
       localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history));
     }
 
-    // Aktif oturumdaki setleri geçici hafızada tut
     let activeSets = JSON.parse(localStorage.getItem("fit_active_sets") || "{}");
 
     function saveActiveSets() {
       localStorage.setItem("fit_active_sets", JSON.stringify(activeSets));
-      updateCounter();
+      updateAnalytics();
     }
 
     function initActiveSets() {
@@ -97,7 +162,6 @@
         if (!activeSets[ex.id]) {
           const hist = getHistory(ex.id);
           const last = hist[hist.length - 1];
-          // Varsayılan olarak 2 set başlatır, varsa son yapılan ağırlıkları getirir
           activeSets[ex.id] = [
             { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "Norm", done: false },
             { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "F", done: false }
@@ -107,7 +171,6 @@
       saveActiveSets();
     }
 
-    // Ekranı Çizdir
     function renderApp() {
       const container = document.getElementById("routineContainer");
       container.innerHTML = "";
@@ -174,7 +237,7 @@
         `;
         container.appendChild(card);
       });
-      updateCounter();
+      updateAnalytics();
     }
 
     function updateSetVal(exId, idx, field, val) {
@@ -211,7 +274,6 @@
       set.done = !set.done;
       saveActiveSets();
 
-      // Tik atıldıysa ortak egzersiz havuzunun geçmişine yaz
       if (set.done) {
         const hist = getHistory(exId);
         const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
@@ -221,15 +283,47 @@
       renderApp();
     }
 
-    function updateCounter() {
+    // Kas Haritası ve Sayaçları Güncelle
+    function updateAnalytics() {
       let totalDone = 0;
-      Object.values(activeSets).forEach(arr => {
-        arr.forEach(s => { if (s.done) totalDone++; });
+      let muscleCounts = { gogus: 0, omuz: 0, sirt: 0, kol: 0 };
+
+      exercisePool.forEach(ex => {
+        const sets = activeSets[ex.id] || [];
+        sets.forEach(s => {
+          if (s.done) {
+            totalDone++;
+            if (ex.tag === "gogus") muscleCounts.gogus++;
+            if (ex.tag === "omuz") muscleCounts.omuz++;
+            if (ex.tag === "sirt") muscleCounts.sirt++;
+            if (ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
+          }
+        });
       });
+
       document.getElementById("completedCounter").innerText = `${totalDone} Set Tamam`;
+      document.getElementById("cnt-gogus").innerText = `${muscleCounts.gogus} Set`;
+      document.getElementById("cnt-omuz").innerText = `${muscleCounts.omuz} Set`;
+      document.getElementById("cnt-sirt").innerText = `${muscleCounts.sirt} Set`;
+      document.getElementById("cnt-kol").innerText = `${muscleCounts.kol} Set`;
+
+      // SVG Kaslarını Parlat
+      const highlightColor = "#2563eb";
+      const defaultColor = "#27272a";
+
+      document.getElementById("muscle-gogus").setAttribute("fill", muscleCounts.gogus > 0 ? highlightColor : defaultColor);
+      document.getElementById("muscle-omuz-on").setAttribute("fill", muscleCounts.omuz > 0 ? highlightColor : defaultColor);
+      document.getElementById("muscle-sirt").setAttribute("fill", muscleCounts.sirt > 0 ? highlightColor : defaultColor);
+      
+      const bicepsActive = (activeSets["btk"] || []).some(s => s.done);
+      document.getElementById("muscle-biceps").setAttribute("fill", bicepsActive ? highlightColor : defaultColor);
+      document.getElementById("muscle-biceps-2").setAttribute("fill", bicepsActive ? highlightColor : defaultColor);
+
+      const tricepsActive = (activeSets["tb"] || []).some(s => s.done);
+      document.getElementById("muscle-triceps").setAttribute("fill", tricepsActive ? highlightColor : defaultColor);
+      document.getElementById("muscle-triceps-2").setAttribute("fill", tricepsActive ? highlightColor : defaultColor);
     }
 
-    // Modal Fonksiyonları
     function openDetailModal(exId) {
       const ex = exercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -262,7 +356,6 @@
         });
       }
 
-      // Grafik Çizimi
       const ctx = document.getElementById('exerciseChart').getContext('2d');
       if (chartInstance) chartInstance.destroy();
 
