@@ -21,7 +21,7 @@
       <span id="completedCounter" class="text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-semibold font-mono">0 Set Tamam</span>
     </div>
 
-    <!-- Rutin Sekmeleri (Yatay Kaydırılabilir) -->
+    <!-- Rutin Sekmeleri -->
     <div id="routineTabs" class="flex gap-2 overflow-x-auto pb-1 text-xs font-semibold scrollbar-none"></div>
   </header>
 
@@ -87,7 +87,7 @@
 
   <!-- Buton: Programa Egzersiz Ekle -->
   <div class="max-w-lg mx-auto px-3 mt-4">
-    <button onclick="openExerciseSelector()" class="w-full py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-blue-400 font-bold text-xs flex items-center justify-center gap-2 hover:bg-zinc-850 active:scale-[0.99] transition shadow-md">
+    <button onclick="openExerciseSelector()" class="w-full py-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 text-blue-400 font-bold text-xs flex items-center justify-center gap-2 hover:bg-zinc-850 active:scale-[0.99] transition shadow-md">
       <span>+</span> Bu Rutine Havuzdan Egzersiz Ekle
     </button>
   </div>
@@ -105,24 +105,18 @@
     </div>
   </div>
 
-  <!-- Detay Modalı (Grafik, YouTube & Geçmiş) -->
+  <!-- Detay Modalı (Grafik & Geçmiş) -->
   <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-zinc-900 border border-zinc-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-3">
-        <div>
-          <h2 id="modalExTitle" class="text-lg font-bold text-white leading-tight"></h2>
-          <span id="modalExMuscle" class="text-xs text-blue-400 font-medium"></span>
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+          <div id="modalExIcon" class="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 p-1.5 flex items-center justify-center"></div>
+          <div>
+            <h2 id="modalExTitle" class="text-lg font-bold text-white leading-tight"></h2>
+            <span id="modalExMuscle" class="text-xs text-blue-400 font-medium"></span>
+          </div>
         </div>
         <button onclick="closeDetailModal()" class="text-zinc-400 hover:text-white text-xl font-bold p-1">✕</button>
-      </div>
-
-      <div id="videoContainer" class="mb-4">
-        <a id="videoLink" href="#" target="_blank" class="flex items-center justify-between bg-zinc-800/80 border border-zinc-700 hover:border-blue-500 p-3 rounded-xl text-xs text-zinc-200 transition">
-          <span class="flex items-center gap-2.5 font-medium">
-            <span class="text-rose-500 text-base">▶</span> Form & Yapılış Rehberini İzle
-          </span>
-          <span class="text-[11px] text-zinc-400 font-mono bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700" id="videoTimeBadge">00:00</span>
-        </a>
       </div>
 
       <div class="bg-black border border-zinc-800 rounded-xl p-3 mb-4">
@@ -138,19 +132,29 @@
   </div>
 
   <script>
-    // MERKEZİ EGZERSİZ HAVUZU (Tüm rutinler bu ortak havuzu kullanır)
+    // SVG İllüstrasyonları (Minimalist vektör hareket görselleri)
+    const icons = {
+      bench: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M2 18h20M6 18v-5h12v5M4 10h16M12 4v6"/></svg>`,
+      shoulder: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><circle cx="12" cy="7" r="4"/><path d="M5 21v-4a7 7 0 0 1 14 0v4M2 10h4M18 10h4"/></svg>`,
+      fly: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M4 19L12 4l8 15M12 12h8M4 12h8"/></svg>`,
+      lateral: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><circle cx="12" cy="5" r="3"/><path d="M12 8v8M4 13h16M6 18l-2 3M18 18l2 3"/></svg>`,
+      pulldown: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M3 5h18M12 5v10M8 12l4 4 4-4M6 20h12"/></svg>`,
+      row: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><circle cx="8" cy="8" r="3"/><path d="M5 20l5-8h6l4 8M14 12v5"/></svg>`,
+      arm: `<svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full"><path d="M6 18a6 6 0 0 1 6-6h4a4 4 0 0 1 4 4v4M10 6h4v4h-4z"/></svg>`
+    };
+
+    // MERKEZİ EGZERSİZ HAVUZU (İllüstrasyonlar entegre edildi)
     const globalExercisePool = [
-      { id: "sp", name: "Shoulder Press", muscle: "Omuz (Ön/Yan)", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=qEwKCR5JCog&t=45s", time: "00:45" },
-      { id: "clr", name: "Cable Lateral Raise", muscle: "Yan Omuz", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=PPrzBWZDOhA&t=30s", time: "00:30" },
-      { id: "bp", name: "Bench Press", muscle: "Göğüs, Ön Omuz, Triceps", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg&t=60s", time: "01:00" },
-      { id: "cf", name: "Cable Fly", muscle: "İç / Orta Göğüs", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o&t=20s", time: "00:20" },
-      { id: "scr", name: "Seated Cable Row", muscle: "Sırt, Lat, Rhomboid", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=GZbfZ033f74&t=15s", time: "00:15" },
-      { id: "lp", name: "Lat Pulldown", muscle: "Üst Sırt, Kanat", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=CAwf7n6Luuc&t=40s", time: "00:40" },
-      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Arka Kol (Triceps)", tag: "triceps", videoUrl: "https://www.youtube.com/watch?v=b_Xhx2qS3oU&t=25s", time: "00:25" },
-      { id: "btk", name: "Biceps Tek Kol", muscle: "Ön Kol (Biceps)", tag: "biceps", videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo&t=10s", time: "00:10" }
+      { id: "sp", name: "Shoulder Press", muscle: "Omuz (Ön/Yan)", tag: "omuz", icon: icons.shoulder },
+      { id: "clr", name: "Cable Lateral Raise", muscle: "Yan Omuz", tag: "omuz", icon: icons.lateral },
+      { id: "bp", name: "Bench Press", muscle: "Göğüs, Ön Omuz, Triceps", tag: "gogus", icon: icons.bench },
+      { id: "cf", name: "Cable Fly", muscle: "İç / Orta Göğüs", tag: "gogus", icon: icons.fly },
+      { id: "scr", name: "Seated Cable Row", muscle: "Sırt, Lat, Rhomboid", tag: "sirt", icon: icons.row },
+      { id: "lp", name: "Lat Pulldown", muscle: "Üst Sırt, Kanat", tag: "sirt", icon: icons.pulldown },
+      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Arka Kol (Triceps)", tag: "triceps", icon: icons.arm },
+      { id: "btk", name: "Biceps Tek Kol", muscle: "Ön Kol (Biceps)", tag: "biceps", icon: icons.arm }
     ];
 
-    // RUTİN LİSTESİ (Kullanıcı yeni rutin ekleyebilir, silebilir)
     let routines = JSON.parse(localStorage.getItem("fit_routines")) || [
       { id: "upper", name: "Upper Body", exerciseIds: ["sp", "clr", "bp", "cf", "scr", "lp", "tb", "btk"] },
       { id: "push", name: "Push (İtiş)", exerciseIds: ["bp", "cf", "sp", "clr", "tb"] }
@@ -189,7 +193,6 @@
       }
     }
 
-    // Rutin Sekmelerini Çiz
     function renderTabs() {
       const tabsContainer = document.getElementById("routineTabs");
       tabsContainer.innerHTML = "";
@@ -224,7 +227,6 @@
       switchRoutine(newId);
     }
 
-    // Uygulama Ana Sayfasını Çiz
     function renderApp() {
       renderTabs();
       const current = routines.find(r => r.id === currentRoutineId) || routines[0];
@@ -274,11 +276,11 @@
         card.innerHTML = `
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-3 cursor-pointer" onclick="openDetailModal('${ex.id}')">
-              <div class="w-9 h-9 rounded-full bg-blue-600/20 text-blue-400 font-bold flex items-center justify-center text-xs">
-                ${ex.name.charAt(0)}
+              <div class="w-10 h-10 rounded-xl bg-zinc-800/90 border border-zinc-700/60 p-2 flex items-center justify-center flex-shrink-0 shadow-inner">
+                ${ex.icon}
               </div>
               <div>
-                <h3 class="text-blue-400 font-bold text-sm hover:underline">${ex.name}</h3>
+                <h3 class="text-blue-400 font-bold text-sm hover:underline leading-tight">${ex.name}</h3>
                 <p class="text-[11px] text-zinc-400">${ex.muscle}</p>
               </div>
             </div>
@@ -352,7 +354,6 @@
       renderApp();
     }
 
-    // Havuzdan Rutine Egzersiz Ekleme/Çıkarma
     function removeExerciseFromRoutine(exId) {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
@@ -371,11 +372,16 @@
       globalExercisePool.forEach(ex => {
         const isAdded = current.exerciseIds.includes(ex.id);
         const item = document.createElement("div");
-        item.className = "flex items-center justify-between p-3 rounded-xl bg-black/60 border border-zinc-800";
+        item.className = "flex items-center justify-between p-2.5 rounded-xl bg-black/60 border border-zinc-800";
         item.innerHTML = `
-          <div>
-            <p class="font-bold text-white text-xs">${ex.name}</p>
-            <p class="text-[10px] text-zinc-400">${ex.muscle}</p>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-zinc-800 p-1.5 flex items-center justify-center">
+              ${ex.icon}
+            </div>
+            <div>
+              <p class="font-bold text-white text-xs">${ex.name}</p>
+              <p class="text-[10px] text-zinc-400">${ex.muscle}</p>
+            </div>
           </div>
           <button onclick="toggleExerciseInRoutine('${ex.id}')" class="text-xs px-3 py-1 rounded-lg font-semibold ${isAdded ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-blue-600 text-white'}">
             ${isAdded ? 'Çıkar' : 'Ekle'}
@@ -397,7 +403,7 @@
         current.exerciseIds.push(exId);
       }
       saveRoutines();
-      openExerciseSelector(); // Listeyi güncelle
+      openExerciseSelector();
       renderApp();
     }
 
@@ -405,7 +411,6 @@
       document.getElementById("exercisePickerModal").classList.add("hidden");
     }
 
-    // Kas Analizi ve Harita
     function updateAnalytics() {
       const current = routines.find(r => r.id === currentRoutineId);
       let totalDone = 0;
@@ -449,18 +454,13 @@
       document.getElementById("muscle-triceps-2").setAttribute("fill", tricepsActive ? highlightColor : defaultColor);
     }
 
-    // Modal Fonksiyonları
     function openDetailModal(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
 
       document.getElementById("modalExTitle").innerText = ex.name;
       document.getElementById("modalExMuscle").innerText = ex.muscle;
-
-      const linkEl = document.getElementById("videoLink");
-      const timeBadge = document.getElementById("videoTimeBadge");
-      linkEl.href = ex.videoUrl;
-      timeBadge.innerText = ex.time || "İzle";
+      document.getElementById("modalExIcon").innerHTML = ex.icon;
 
       const hist = getHistory(exId);
       const histContainer = document.getElementById("historyList");
