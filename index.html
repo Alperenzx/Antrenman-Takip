@@ -9,26 +9,32 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* iOS Safari yatay taşma ve kayma kilidi */
+    /* iOS Çentik ve Durum Çubuğu Güvenli Alanı */
+    :root {
+      --sat: env(safe-area-inset-top, 20px);
+    }
     html, body {
       max-width: 100vw;
       overflow-x: hidden;
       background-color: #000000;
       -webkit-tap-highlight-color: transparent;
     }
+    .safe-top {
+      padding-top: calc(var(--sat) + 12px) !important;
+    }
     input, select, button {
-      font-size: 13px !important; /* iOS input yakınlaşmasını engeller */
+      font-size: 13px !important;
     }
   </style>
 </head>
 <body class="bg-black text-zinc-100 min-h-screen pb-32 font-sans select-none antialiased">
 
-  <!-- Üst Bar & Rutin Başlığı -->
-  <header class="p-3 pt-5 border-b border-zinc-900 sticky top-0 bg-black/95 backdrop-blur-md z-40">
-    <div class="flex justify-between items-center mb-2">
+  <!-- Üst Bar (iPhone Çentiğinin Tam Altına Sabitlendi) -->
+  <header class="safe-top px-4 pb-3 border-b border-zinc-900 bg-black/95 backdrop-blur-md sticky top-0 z-40">
+    <div class="flex justify-between items-center mb-2.5">
       <div class="flex items-center gap-2">
         <h1 id="currentRoutineName" class="text-lg font-bold text-white tracking-tight">Upper Body</h1>
-        <button onclick="createNewRoutine()" class="text-[11px] bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-700 active:scale-95">+ Rutin</button>
+        <button onclick="createNewRoutine()" class="text-[11px] bg-zinc-800 text-zinc-300 px-2 py-1 rounded-md border border-zinc-700 active:scale-95">+ Rutin</button>
       </div>
       <span id="completedCounter" class="text-[11px] bg-blue-600/20 text-blue-400 border border-blue-500/30 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 Set</span>
     </div>
@@ -48,31 +54,23 @@
 
       <!-- Vücut Silüetleri -->
       <div class="flex justify-around items-center bg-zinc-900/50 p-2 rounded-xl border border-zinc-800/60 mb-2.5">
-        <!-- Ön Gövde -->
         <div class="flex flex-col items-center">
           <span class="text-[9px] text-zinc-500 font-bold mb-1">ÖN</span>
           <svg class="w-20 h-32" viewBox="0 0 100 160">
             <circle cx="50" cy="18" r="10" stroke="#3f3f46" stroke-width="1.5" fill="#18181b"/>
-            <!-- Omuz -->
             <path id="muscle-omuz-on" d="M28 36 Q50 30 72 36 L78 48 Q50 44 22 48 Z" fill="#27272a"/>
-            <!-- Göğüs -->
             <path id="muscle-gogus" d="M30 47 Q50 49 70 47 L68 66 Q50 69 32 66 Z" fill="#27272a"/>
-            <!-- Karın -->
             <path d="M35 68 Q50 70 65 68 L62 96 Q50 98 38 96 Z" fill="#18181b"/>
-            <!-- Kollar (Biceps) -->
             <rect id="muscle-biceps" x="16" y="52" width="7" height="20" rx="3" fill="#27272a"/>
             <rect id="muscle-biceps-2" x="77" y="52" width="7" height="20" rx="3" fill="#27272a"/>
           </svg>
         </div>
 
-        <!-- Arka Gövde -->
         <div class="flex flex-col items-center border-l border-zinc-800 pl-4">
           <span class="text-[9px] text-zinc-500 font-bold mb-1">ARKA</span>
           <svg class="w-20 h-32" viewBox="0 0 100 160">
             <circle cx="50" cy="18" r="10" stroke="#3f3f46" stroke-width="1.5" fill="#18181b"/>
-            <!-- Sırt -->
             <path id="muscle-sirt" d="M30 36 Q50 41 70 36 L76 70 Q50 74 24 70 Z" fill="#27272a"/>
-            <!-- Triceps -->
             <rect id="muscle-triceps" x="15" y="48" width="7" height="20" rx="3" fill="#27272a"/>
             <rect id="muscle-triceps-2" x="78" y="48" width="7" height="20" rx="3" fill="#27272a"/>
             <path d="M36 72 Q50 74 64 72 L61 96 Q50 98 39 96 Z" fill="#18181b"/>
@@ -110,7 +108,7 @@
     </button>
   </div>
 
-  <!-- Detay Modalı (Grafik & Geçmiş) -->
+  <!-- Detay Modalı -->
   <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center p-0">
     <div class="bg-zinc-900 border-t border-zinc-800 w-full rounded-t-3xl p-4 max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-3">
@@ -496,7 +494,7 @@
           plugins: { legend: { display: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 9 } } },
-            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 9 } } }
+            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 10 } } }
           }
         }
       });
