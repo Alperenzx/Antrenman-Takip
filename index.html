@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Antrenman Takip</title>
@@ -16,43 +19,66 @@
       padding-top: var(--sat);
       background-color: #000000;
       color: #f4f4f5;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-    /* Modal açıkken arka planı kitleyen sınıf */
     body.modal-open {
       overflow: hidden !important;
       touch-action: none;
     }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    
-    /* Yeni eklenen kartların Hevy tarzı akıcı geliş animasyonu */
-    @keyframes cardFadeInUp {
-      from {
+
+    /* --- AKICI ANİMASYONLAR --- */
+    @keyframes modalPopCenter {
+      0% {
         opacity: 0;
-        transform: translateY(14px) scale(0.98);
+        transform: scale(0.92) translateY(12px);
       }
-      to {
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    @keyframes sheetSlideUp {
+      0% {
+        transform: translateY(100%);
+      }
+      100% {
+        transform: translateY(0);
+      }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes cardFadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.97);
+      }
+      100% {
         opacity: 1;
         transform: translateY(0) scale(1);
       }
     }
-    .animate-card {
-      animation: cardFadeInUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+
+    .anim-fade { animation: fadeIn 0.22s ease-out forwards; }
+    .anim-pop-center { animation: modalPopCenter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .anim-sheet-up { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .animate-card { animation: cardFadeInUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
   </style>
 </head>
-<body class="min-h-screen pb-24">
+<body class="min-h-screen pb-24 antialiased">
 
   <!-- ================= EKRAN 1: ANA SAYFA ================= -->
   <div id="viewHome" class="px-4 max-w-md mx-auto">
     <header class="py-5 border-b border-zinc-900 flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-black tracking-tight text-white">Programlar</h1>
-        <p class="text-xs text-zinc-500">Antrenmana başlamak için seç</p>
+        <p class="text-xs text-zinc-500 font-medium">Başlamak için bir antrenman seç</p>
       </div>
-      <button onclick="openNewRoutineModal()" class="bg-blue-600 active:scale-95 transition text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/20">
+      <button onclick="openNewRoutineModal()" class="bg-blue-600 hover:bg-blue-500 active:scale-90 transition text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-blue-600/25">
         + Yeni Program
       </button>
     </header>
@@ -81,10 +107,8 @@
       </div>
     </header>
 
-    <!-- Hareket Kartları Listesi -->
     <main id="routineContainer" class="mt-3 space-y-3"></main>
 
-    <!-- Hareketi Ekle Butonu -->
     <div class="mt-4">
       <button onclick="openExerciseSelector()" class="w-full py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-blue-400 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition shadow-md">
         <span class="text-base font-bold">+</span> Egzersiz Ekle
@@ -93,30 +117,49 @@
   </div>
 
 
-  <!-- ================= BOTTOM SHEET: MODERN YENİ PROGRAM OLUŞTURMA ================= -->
-  <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center transition-opacity" onclick="closeNewRoutineModal(event)">
-    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-5 pb-8 shadow-2xl" onclick="event.stopPropagation()">
-      <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-4"></div>
-      
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-base font-bold text-white">Yeni Antrenman Programı</h3>
-        <button onclick="closeNewRoutineModal()" class="text-zinc-400 text-lg font-bold p-1">✕</button>
+  <!-- ================= MERKEZİ POPUP: YENİ PROGRAM ADI ================= -->
+  <div id="newRoutineModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
+    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl anim-pop-center" onclick="event.stopPropagation()">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/15 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
+        📋
       </div>
-      <p class="text-xs text-zinc-400 mb-4">Programına bir isim ver (Örn: Upper Body, Push, İtiş Günü).</p>
+      <h3 class="text-center text-lg font-bold text-white mb-1">Yeni Program Oluştur</h3>
+      <p class="text-center text-xs text-zinc-400 mb-5">Programına vermek istediğin ismi yaz.</p>
 
-      <input id="newRoutineInput" type="text" placeholder="Program Adı..." class="w-full bg-black border border-zinc-800 focus:border-blue-500 rounded-xl p-3 text-sm text-white focus:outline-none mb-4 transition font-medium">
+      <input id="newRoutineInput" type="text" placeholder="Örn: Upper Body, Push, Bacak" class="w-full bg-black border border-zinc-700 focus:border-blue-500 rounded-2xl p-3.5 text-center text-sm text-white focus:outline-none mb-4 transition font-semibold">
 
       <div class="flex gap-2">
-        <button onclick="closeNewRoutineModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition">Vazgeç</button>
+        <button onclick="closeNewRoutineModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs active:scale-95 transition">Vazgeç</button>
         <button onclick="submitNewRoutine()" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 active:scale-95 transition">Oluştur</button>
       </div>
     </div>
   </div>
 
 
-  <!-- ================= BOTTOM SHEET: ÇOKLU EGZERSİZ SEÇİMİ ================= -->
-  <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center" onclick="closeExerciseSelector(event)">
-    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-5 max-h-[85vh] flex flex-col shadow-2xl" onclick="event.stopPropagation()">
+  <!-- ================= MERKEZİ POPUP: YENİ HAREKET TANIMLA ================= -->
+  <div id="newExerciseModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewExerciseModal(event)">
+    <div class="bg-zinc-900 border border-zinc-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl anim-pop-center" onclick="event.stopPropagation()">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600/15 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
+        💪
+      </div>
+      <h3 class="text-center text-lg font-bold text-white mb-1">Yeni Hareket Ekle</h3>
+      <p class="text-center text-xs text-zinc-400 mb-4">Hareket adını ve hedef kas grubunu belirle.</p>
+
+      <input id="newExNameInput" type="text" placeholder="Hareket Adı (Örn: Incline Dumbbell Press)" class="w-full bg-black border border-zinc-700 focus:border-blue-500 rounded-2xl p-3 text-center text-xs text-white focus:outline-none mb-2.5 transition font-semibold">
+
+      <input id="newExMuscleInput" type="text" placeholder="Kas Bölgesi (Göğüs, Omuz, Sırt, Kol)" class="w-full bg-black border border-zinc-700 focus:border-blue-500 rounded-2xl p-3 text-center text-xs text-white focus:outline-none mb-4 transition font-semibold">
+
+      <div class="flex gap-2">
+        <button onclick="closeNewExerciseModal()" class="flex-1 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-xs active:scale-95 transition">İptal</button>
+        <button onclick="submitNewExercise()" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-lg shadow-blue-600/30 active:scale-95 transition">Havuza Ekle</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= ALTTAN AÇILAN PANEL: ÇOKLU EGZERSİZ SEÇİMİ ================= -->
+  <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
+    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet-up" onclick="event.stopPropagation()">
       <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-3"></div>
       
       <div class="flex justify-between items-center mb-2">
@@ -127,15 +170,12 @@
         <button onclick="closeExerciseSelector()" class="text-zinc-400 text-lg font-bold p-1">✕</button>
       </div>
 
-      <!-- Yeni Hareket Ekle Çubuğu -->
-      <button onclick="promptCreateNewExercise()" class="my-2.5 w-full py-2.5 rounded-xl bg-black border border-zinc-800 text-blue-400 text-xs font-bold active:scale-[0.99] transition">
+      <button onclick="openNewExerciseModal()" class="my-2.5 w-full py-2.5 rounded-xl bg-black border border-zinc-800 text-blue-400 text-xs font-bold active:scale-[0.98] transition">
         + Listede Olmayan Yeni Hareket Üret
       </button>
 
-      <!-- Çoklu Seçim Listesi -->
       <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 py-1 pr-1 overscroll-contain"></div>
 
-      <!-- Kaydet Butonu -->
       <div class="pt-3 border-t border-zinc-800 mt-2">
         <button onclick="saveSelectedExercises()" id="btnConfirmSelect" class="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold text-xs shadow-lg shadow-blue-600/30 transition">
           Seçilenleri Kaydet
@@ -146,8 +186,8 @@
 
 
   <!-- ================= DETAY MODALI (GRAFİK & GEÇMİŞ) ================= -->
-  <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center" onclick="closeDetailModal(event)">
-    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto overscroll-contain" onclick="event.stopPropagation()">
+  <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeDetailModal(event)">
+    <div class="bg-zinc-900 border-t border-zinc-800 w-full max-w-md rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto overscroll-contain anim-sheet-up" onclick="event.stopPropagation()">
       <div class="w-10 h-1 bg-zinc-700 rounded-full mx-auto mb-3"></div>
       
       <div class="flex justify-between items-center mb-3">
@@ -159,7 +199,7 @@
       </div>
 
       <div class="bg-black border border-zinc-800 rounded-xl p-3 mb-3">
-        <h4 class="text-[10px] font-semibold text-zinc-400 mb-1">AĞIRLIK İLERLEMESİ (KG)</h4>
+        <h4 class="text-[10px] font-semibold text-zinc-400 mb-1">AĞIRLIK GELİŞİM GRAFİĞİ (KG)</h4>
         <canvas id="exerciseChart" height="150"></canvas>
       </div>
 
@@ -172,7 +212,6 @@
 
 
   <script>
-    // Ortak Egzersiz Havuzu
     let globalExercisePool = JSON.parse(localStorage.getItem("fit_pool")) || [
       { id: "sp", name: "Shoulder Press", muscle: "Omuz" },
       { id: "clr", name: "Cable Lateral Raise", muscle: "Omuz" },
@@ -200,11 +239,9 @@
       updateCompletedCounter();
     }
 
-    // Modal Arka Plan Kilidi
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
 
-    // ================= EKRAN YÖNETİMİ =================
     function goHome() {
       currentRoutineId = null;
       document.getElementById("viewWorkout").classList.add("hidden");
@@ -219,7 +256,6 @@
       renderWorkout(true);
     }
 
-    // ================= ANA SAYFA =================
     function renderHome() {
       const container = document.getElementById("routineCardList");
       container.innerHTML = "";
@@ -235,10 +271,11 @@
         return;
       }
 
-      routines.forEach(r => {
+      routines.forEach((r, idx) => {
         const count = r.exerciseIds.length;
         const card = document.createElement("div");
-        card.className = "bg-zinc-950 border border-zinc-900 active:border-blue-500/50 p-4 rounded-2xl flex items-center justify-between active:scale-[0.99] transition cursor-pointer";
+        card.className = "bg-zinc-950 border border-zinc-900 active:border-blue-500/50 p-4 rounded-2xl flex items-center justify-between active:scale-[0.98] transition cursor-pointer animate-card";
+        card.style.animationDelay = `${idx * 40}ms`;
         card.onclick = () => openWorkout(r.id);
         card.innerHTML = `
           <div>
@@ -251,14 +288,14 @@
       });
     }
 
-    // ================= MODERN PROGRAM OLUŞTURMA MODALI =================
+    // --- MERKEZİ PROGRAM MODALI ---
     function openNewRoutineModal() {
       const modal = document.getElementById("newRoutineModal");
       const input = document.getElementById("newRoutineInput");
       input.value = "";
       modal.classList.remove("hidden");
       lockScroll();
-      setTimeout(() => input.focus(), 50);
+      setTimeout(() => input.focus(), 60);
     }
 
     function closeNewRoutineModal() {
@@ -271,16 +308,36 @@
       const name = input.value.trim();
       if (!name) return;
 
-      const newRoutine = {
-        id: "r_" + Date.now(),
-        name: name,
-        exerciseIds: []
-      };
-
+      const newRoutine = { id: "r_" + Date.now(), name: name, exerciseIds: [] };
       routines.push(newRoutine);
       saveRoutines();
       closeNewRoutineModal();
       openWorkout(newRoutine.id);
+    }
+
+    // --- MERKEZİ HAREKET MODALI ---
+    function openNewExerciseModal() {
+      document.getElementById("newExNameInput").value = "";
+      document.getElementById("newExMuscleInput").value = "";
+      document.getElementById("newExerciseModal").classList.remove("hidden");
+    }
+
+    function closeNewExerciseModal() {
+      document.getElementById("newExerciseModal").classList.add("hidden");
+    }
+
+    function submitNewExercise() {
+      const name = document.getElementById("newExNameInput").value.trim();
+      const muscle = document.getElementById("newExMuscleInput").value.trim() || "Genel";
+      if (!name) return;
+
+      const newEx = { id: "ex_" + Date.now(), name: name, muscle: muscle };
+      globalExercisePool.push(newEx);
+      savePool();
+
+      tempSelectedExerciseIds.push(newEx.id);
+      closeNewExerciseModal();
+      renderPickerList();
     }
 
     function deleteCurrentRoutine() {
@@ -291,7 +348,7 @@
       }
     }
 
-    // ================= ANTRENMAN EKRANI =================
+    // --- ANTRENMAN RENDER ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -354,8 +411,8 @@
               <p class="text-[10px] text-zinc-500">${ex.muscle}</p>
             </div>
             <div class="flex items-center gap-1">
-              <button onclick="openDetailModal('${ex.id}')" class="text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded font-mono">Grafik</button>
-              <button onclick="removeExerciseFromRoutine('${ex.id}')" class="text-zinc-600 hover:text-rose-400 text-xs px-1.5">✕</button>
+              <button onclick="openDetailModal('${ex.id}')" class="text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-2 py-0.5 rounded font-mono active:scale-90 transition">Grafik</button>
+              <button onclick="removeExerciseFromRoutine('${ex.id}')" class="text-zinc-600 hover:text-rose-400 text-xs px-1.5 active:scale-90 transition">✕</button>
             </div>
           </div>
           <div class="space-y-1 mb-2">
@@ -365,8 +422,8 @@
             ${setsHtml}
           </div>
           <div class="flex justify-between items-center pt-1.5 border-t border-zinc-900">
-            <button onclick="addSet('${ex.id}')" class="text-[11px] font-semibold text-blue-400 py-0.5 px-1.5 active:scale-95 transition">+ Set Ekle</button>
-            <button onclick="removeSet('${ex.id}')" class="text-[10px] text-zinc-500 hover:text-rose-400 py-0.5 px-1.5 active:scale-95 transition">- Set Sil</button>
+            <button onclick="addSet('${ex.id}')" class="text-[11px] font-semibold text-blue-400 py-0.5 px-1.5 active:scale-90 transition">+ Set Ekle</button>
+            <button onclick="removeSet('${ex.id}')" class="text-[10px] text-zinc-500 hover:text-rose-400 py-0.5 px-1.5 active:scale-90 transition">- Set Sil</button>
           </div>
         `;
         container.appendChild(card);
@@ -444,7 +501,7 @@
       document.getElementById("completedCounter").innerText = `${totalDone} Set`;
     }
 
-    // ================= ÇOKLU SEÇİM & ANİMASYONLU EKLEME =================
+    // --- HAVUZDAN ÇOKLU SEÇİM ---
     function openExerciseSelector() {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
@@ -467,14 +524,14 @@
       globalExercisePool.forEach(ex => {
         const isSelected = tempSelectedExerciseIds.includes(ex.id);
         const item = document.createElement("div");
-        item.className = `flex items-center justify-between p-3 rounded-xl border transition active:scale-[0.99] cursor-pointer ${isSelected ? 'bg-blue-600/15 border-blue-500' : 'bg-black border-zinc-800'}`;
+        item.className = `flex items-center justify-between p-3 rounded-2xl border transition active:scale-[0.98] cursor-pointer ${isSelected ? 'bg-blue-600/15 border-blue-500 shadow-sm' : 'bg-black border-zinc-800'}`;
         item.onclick = () => toggleTempSelection(ex.id);
         item.innerHTML = `
           <div>
             <p class="font-bold text-white text-xs">${ex.name}</p>
             <p class="text-[10px] text-zinc-500">${ex.muscle}</p>
           </div>
-          <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs ${isSelected ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-500'}">
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-xs transition ${isSelected ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-500'}">
             ${isSelected ? '✓' : '+'}
           </div>
         `;
@@ -500,26 +557,10 @@
       current.exerciseIds = [...tempSelectedExerciseIds];
       saveRoutines();
       closeExerciseSelector();
-      
-      // Kaydedince hareket kartlarını yukarı doğru akıcı animasyonla getirir
       renderWorkout(true);
     }
 
-    function promptCreateNewExercise() {
-      const name = prompt("Yeni Hareketin Adı:");
-      if (!name || !name.trim()) return;
-
-      const region = prompt("Kas Bölgesi (Göğüs, Omuz, Sırt, Kol):", "Göğüs");
-      const newEx = { id: "ex_" + Date.now(), name: name.trim(), muscle: region || "Genel" };
-      
-      globalExercisePool.push(newEx);
-      savePool();
-
-      tempSelectedExerciseIds.push(newEx.id);
-      renderPickerList();
-    }
-
-    // ================= DETAY & GRAFİK =================
+    // --- DETAY MODALI ---
     function openDetailModal(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -536,7 +577,7 @@
       } else {
         [...hist].reverse().forEach(h => {
           const row = document.createElement("div");
-          row.className = "flex justify-between items-center bg-black p-2 rounded border border-zinc-800 text-[11px] font-mono";
+          row.className = "flex justify-between items-center bg-black p-2 rounded-xl border border-zinc-800 text-[11px] font-mono";
           row.innerHTML = `<span class="text-zinc-500">${h.date}</span><span class="font-bold text-white">${h.kg} KG</span><span class="text-zinc-400">${h.reps} Rep</span><span class="${h.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${h.type}]</span>`;
           histContainer.appendChild(row);
         });
@@ -576,7 +617,6 @@
       unlockScroll();
     }
 
-    // İlk açılış: Ana sayfa
     goHome();
   </script>
 </body>
