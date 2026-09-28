@@ -22,13 +22,21 @@
       --sat: env(safe-area-inset-top, 44px);
       --sab: env(safe-area-inset-bottom, 20px);
     }
+    * {
+      -webkit-touch-callout: none !important; /* iOS mavi metin/menü kutusunu tamamen engeller */
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+    input, textarea {
+      -webkit-user-select: auto !important;
+      user-select: auto !important;
+    }
     body {
       padding-top: var(--sat);
       background-color: #000000;
       color: #f4f4f5;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
       letter-spacing: -0.015em;
     }
     .font-num {
@@ -66,9 +74,9 @@
       to { opacity: 1; }
     }
     @keyframes wiggleEffect {
-      0% { transform: rotate(-0.6deg); }
-      50% { transform: rotate(0.6deg); }
-      100% { transform: rotate(-0.6deg); }
+      0% { transform: rotate(-0.7deg); }
+      50% { transform: rotate(0.7deg); }
+      100% { transform: rotate(-0.7deg); }
     }
 
     .anim-forward { animation: pageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -77,7 +85,7 @@
     .anim-pop { animation: modalCenterPop 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-sheet { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
-    .wiggle { animation: wiggleEffect 0.2s ease-in-out infinite; }
+    .wiggle { animation: wiggleEffect 0.22s ease-in-out infinite; }
 
     .tap-press {
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -87,13 +95,14 @@
       opacity: 0.85;
     }
 
-    .floating-btn {
-      bottom: calc(var(--sab) + 16px);
+    .fab-bottom-right {
+      position: fixed;
+      bottom: calc(var(--sab) + 18px);
       right: 18px;
     }
   </style>
 </head>
-<body class="min-h-screen pb-28 antialiased">
+<body class="min-h-screen pb-32 antialiased">
 
   <!-- ================= SAYFA 1: ANA SAYFA (PROGRAMLAR) ================= -->
   <div id="viewHome" class="px-4 max-w-md mx-auto">
@@ -110,8 +119,8 @@
     <div id="routineCardList" class="mt-4 space-y-3"></div>
 
     <!-- SAĞ ALTTADURAN MODERN BALONCUK BUTONU -->
-    <div class="fixed floating-btn z-40">
-      <button onclick="openLibraryPage()" class="tap-press w-14 h-14 rounded-full bg-zinc-900/90 border border-zinc-700/80 hover:border-blue-500/80 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl">
+    <div class="fab-bottom-right z-40">
+      <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900/95 border border-zinc-700/80 hover:border-blue-500/80 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl">
         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 10v4" />
           <path d="M6 7v10" />
@@ -181,7 +190,7 @@
       </div>
     </header>
 
-    <p class="text-[11px] text-zinc-500 mt-3 px-1">Sıralamak için basılı tut veya 'Düzenle'ye bas:</p>
+    <p class="text-[11px] text-zinc-500 mt-3 px-1">Sıralamak için basılı tut veya 'Düzenle'ye dokun:</p>
 
     <div id="libraryListContainer" class="mt-3 space-y-2.5 mb-8"></div>
   </div>
@@ -244,7 +253,6 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- 1. EN ÜST: ÖZEL NOT / AYAR EKLEME ALANI -->
     <section class="mt-4 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">HAREKET NOTLARI & AYARLAR</h3>
@@ -253,7 +261,6 @@
       <textarea id="workoutExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-800/80 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
-    <!-- 2. ORTA: VİDEO KUTUSU (BİRAZDAN EKLENECEK VİDEOLAR İÇİN HAZIR ALTYAPI) -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2 px-1">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM & YAPILIŞ VİDEOSU</h3>
@@ -264,11 +271,10 @@
           ▶
         </div>
         <p class="text-xs font-bold text-white" id="workoutVideoLabel">Video Bağlantısı</p>
-        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel form rehberi birazdan bağlanacak.</p>
+        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel form rehberi eklenebilir.</p>
       </div>
     </section>
 
-    <!-- 3. ALT: GEÇMİŞ DÖKÜMÜ (AYNI GÜNLER BİR ARADA) -->
     <section class="mt-3.5 mb-8">
       <div class="flex justify-between items-center mb-2 px-1">
         <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
@@ -381,10 +387,14 @@
 
     // --- UZUN BASMA (LONG-PRESS) TESPİTİ ---
     function attachLongPress(element, callback) {
-      const start = () => {
+      let moved = false;
+      const start = (e) => {
+        moved = false;
         longPressTimer = setTimeout(() => {
-          callback();
-        }, 550);
+          if (!moved) {
+            callback();
+          }
+        }, 450);
       };
       const cancel = () => {
         if (longPressTimer) {
@@ -394,11 +404,10 @@
       };
 
       element.addEventListener("touchstart", start, { passive: true });
+      element.addEventListener("touchmove", () => { moved = true; cancel(); }, { passive: true });
       element.addEventListener("touchend", cancel);
-      element.addEventListener("touchmove", cancel);
-      element.addEventListener("mousedown", start);
-      element.addEventListener("mouseup", cancel);
-      element.addEventListener("mouseleave", cancel);
+      element.addEventListener("touchcancel", cancel);
+      element.addEventListener("contextmenu", (e) => { e.preventDefault(); return false; }); // iOS popup menüyü keser
     }
 
     function toggleReorderMode(scope) {
@@ -519,7 +528,7 @@
       }
     }
 
-    // --- ANTRENMAN MODU (SIRALAMA & DÜZENLEME) ---
+    // --- ANTRENMAN MODU ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -558,10 +567,10 @@
         const lastRec = hist[hist.length - 1];
 
         const card = document.createElement("div");
-        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/40' : ''}`;
+        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
 
-        // Uzun basma olayı
+        // Uzun basma olayı (mavi kutu olmadan modu açar)
         attachLongPress(card, () => {
           if (!isReorderingRoutine) toggleReorderMode('routine');
         });
@@ -598,16 +607,14 @@
               <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
             </div>
 
-            <!-- Düzenleme / Sıralama Kontrolleri -->
+            <!-- Düzenleme Modu Kontrolleri (Çarpı kalktı, sadece düzenleme modunda kontroller var) -->
             ${isReorderingRoutine ? `
-              <div class="flex items-center gap-1">
-                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▲</button>
-                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▼</button>
-                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-7 h-7 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-bold active:scale-90 ml-1">✕</button>
+              <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▲</button>
+                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▼</button>
+                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1">🗑️</button>
               </div>
-            ` : `
-              <button onclick="removeExerciseFromRoutine('${ex.id}')" class="tap-press text-zinc-600 hover:text-rose-400 text-xs px-2 py-1">✕</button>
-            `}
+            ` : ''}
           </div>
 
           ${sets.length > 0 ? `
@@ -758,7 +765,7 @@
         const maxKg = getMaxKg(hist);
 
         const card = document.createElement("div");
-        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md ${isReorderingLibrary ? 'wiggle border-blue-500/40' : ''}`;
+        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md transition ${isReorderingLibrary ? 'wiggle border-blue-500/50' : ''}`;
         card.style.animationDelay = `${idx * 20}ms`;
 
         attachLongPress(card, () => {
@@ -776,10 +783,10 @@
           </div>
           
           ${isReorderingLibrary ? `
-            <div class="flex items-center gap-1" onclick="event.stopPropagation()">
-              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▲</button>
-              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-lg text-xs font-bold active:scale-90">▼</button>
-              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-7 h-7 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-lg text-xs font-bold active:scale-90 ml-1">✕</button>
+            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▲</button>
+              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▼</button>
+              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1">🗑️</button>
             </div>
           ` : `
             <div class="text-right font-num">
@@ -854,14 +861,11 @@
       document.getElementById("workoutExDetailTitle").innerText = ex.name;
       document.getElementById("workoutExDetailMuscle").innerText = ex.muscle;
 
-      // 1. Not Yükle
       const note = localStorage.getItem(`fit_note_${exId}`) || "";
       document.getElementById("workoutExNoteInput").value = note;
 
-      // 2. Video Kutusu Durumu
       document.getElementById("workoutVideoLabel").innerText = `${ex.name} Form Rehberi`;
 
-      // 3. Antrenman Geçmişi (Tarih Bazlı Gruplanmış)
       const hist = getHistory(exId);
       const histContainer = document.getElementById("workoutExHistoryList");
       histContainer.innerHTML = "";
@@ -890,7 +894,6 @@
       alert("Not kaydedildi!");
     }
 
-    // --- ORTAK TARİH BAZLI GEÇMİŞ OLUŞTURUCU ---
     function renderGroupedHistory(hist, container, prefix) {
       if (!hist || hist.length === 0) {
         container.innerHTML = `<p class="text-zinc-600 text-xs py-4 text-center font-medium bg-zinc-950 border border-zinc-800/80 rounded-2xl">Henüz tamamlanan set kaydı yok.</p>`;
