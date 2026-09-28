@@ -23,7 +23,7 @@
       --sab: env(safe-area-inset-bottom, 20px);
     }
     * {
-      -webkit-touch-callout: none !important; /* iOS mavi metin/menü kutusunu tamamen engeller */
+      -webkit-touch-callout: none !important;
       -webkit-user-select: none !important;
       user-select: none !important;
     }
@@ -48,7 +48,6 @@
       touch-action: none;
     }
 
-    /* Animasyonlar */
     @keyframes pageSlideIn {
       from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
@@ -74,9 +73,9 @@
       to { opacity: 1; }
     }
     @keyframes wiggleEffect {
-      0% { transform: rotate(-0.7deg); }
-      50% { transform: rotate(0.7deg); }
-      100% { transform: rotate(-0.7deg); }
+      0% { transform: rotate(-0.8deg); }
+      50% { transform: rotate(0.8deg); }
+      100% { transform: rotate(-0.8deg); }
     }
 
     .anim-forward { animation: pageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -85,7 +84,7 @@
     .anim-pop { animation: modalCenterPop 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-sheet { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
-    .wiggle { animation: wiggleEffect 0.22s ease-in-out infinite; }
+    .wiggle { animation: wiggleEffect 0.24s ease-in-out infinite; }
 
     .tap-press {
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -95,10 +94,12 @@
       opacity: 0.85;
     }
 
-    .fab-bottom-right {
-      position: fixed;
-      bottom: calc(var(--sab) + 18px);
-      right: 18px;
+    /* Ekranın En Sağ Altına Kesinlikle Sabit Baloncuk */
+    .screen-fab-fixed {
+      position: fixed !important;
+      bottom: calc(var(--sab) + 20px) !important;
+      right: 20px !important;
+      z-index: 9999 !important;
     }
   </style>
 </head>
@@ -117,21 +118,22 @@
     </header>
 
     <div id="routineCardList" class="mt-4 space-y-3"></div>
+  </div>
 
-    <!-- SAĞ ALTTADURAN MODERN BALONCUK BUTONU -->
-    <div class="fab-bottom-right z-40">
-      <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900/95 border border-zinc-700/80 hover:border-blue-500/80 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 10v4" />
-          <path d="M6 7v10" />
-          <path d="M6 12h12" />
-          <path d="M18 7v10" />
-          <path d="M22 10v4" />
-          <rect x="4.5" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
-          <rect x="18" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
-        </svg>
-      </button>
-    </div>
+
+  <!-- EKRANIN EN SAĞ ALTINA SABİTLENMİŞ BAĞIMSIZ BALONCUK -->
+  <div id="floatingExerciseBubble" class="screen-fab-fixed">
+    <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900 border border-zinc-700 hover:border-blue-500 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl active:scale-90">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 10v4" />
+        <path d="M6 7v10" />
+        <path d="M6 12h12" />
+        <path d="M18 7v10" />
+        <path d="M22 10v4" />
+        <rect x="4.5" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
+        <rect x="18" y="8" width="1.5" height="8" rx="0.5" fill="currentColor" fill-opacity="0.3"/>
+      </svg>
+    </button>
   </div>
 
 
@@ -148,10 +150,9 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button id="btnToggleReorderRoutine" onclick="toggleReorderMode('routine')" class="text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1 rounded-full font-bold">
+        <button id="btnToggleReorderRoutine" onclick="toggleReorderMode('routine')" class="text-[11px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full font-bold active:scale-90">
           Düzenle
         </button>
-        <span id="completedCounter" class="text-[11px] bg-blue-600/15 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-num font-bold">0 Set</span>
         <button onclick="deleteCurrentRoutine()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 text-zinc-500 hover:text-rose-400 flex items-center justify-center text-xs">
           🗑️
         </button>
@@ -181,7 +182,7 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button id="btnToggleReorderLibrary" onclick="toggleReorderMode('library')" class="text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1.5 rounded-xl font-bold">
+        <button id="btnToggleReorderLibrary" onclick="toggleReorderMode('library')" class="text-[11px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-xl font-bold active:scale-90">
           Düzenle
         </button>
         <button onclick="openNewExerciseModal(true)" class="tap-press text-xs font-bold bg-blue-600 text-white px-3 py-1.5 rounded-xl shadow-sm border border-blue-500/30">
@@ -196,7 +197,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI (SADECE İSTATİSTİK) ================= -->
+  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI ================= -->
   <div id="viewLibraryDetail" class="hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeLibraryDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -240,7 +241,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI (NOT + VİDEO + GEÇMİŞ) ================= -->
+  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI ================= -->
   <div id="viewWorkoutExerciseDetail" class="hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeWorkoutExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -377,10 +378,7 @@
     function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
     function getHistory(exId) { return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]"); }
     function saveHistory(exId, history) { localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history)); }
-    function saveRoutineSets() {
-      localStorage.setItem("fit_routine_sets", JSON.stringify(routineSets));
-      updateCompletedCounter();
-    }
+    function saveRoutineSets() { localStorage.setItem("fit_routine_sets", JSON.stringify(routineSets)); }
 
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
@@ -388,12 +386,10 @@
     // --- UZUN BASMA (LONG-PRESS) TESPİTİ ---
     function attachLongPress(element, callback) {
       let moved = false;
-      const start = (e) => {
+      const start = () => {
         moved = false;
         longPressTimer = setTimeout(() => {
-          if (!moved) {
-            callback();
-          }
+          if (!moved) callback();
         }, 450);
       };
       const cancel = () => {
@@ -407,7 +403,7 @@
       element.addEventListener("touchmove", () => { moved = true; cancel(); }, { passive: true });
       element.addEventListener("touchend", cancel);
       element.addEventListener("touchcancel", cancel);
-      element.addEventListener("contextmenu", (e) => { e.preventDefault(); return false; }); // iOS popup menüyü keser
+      element.addEventListener("contextmenu", (e) => { e.preventDefault(); return false; });
     }
 
     function toggleReorderMode(scope) {
@@ -415,13 +411,13 @@
         isReorderingRoutine = !isReorderingRoutine;
         const btn = document.getElementById("btnToggleReorderRoutine");
         btn.innerText = isReorderingRoutine ? "Bitti ✓" : "Düzenle";
-        btn.className = isReorderingRoutine ? "text-[11px] bg-blue-600 text-white px-3 py-1 rounded-full font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1 rounded-full font-bold";
+        btn.className = isReorderingRoutine ? "text-[11px] bg-blue-600 text-white px-3 py-1.5 rounded-full font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full font-bold";
         renderWorkout(false);
       } else if (scope === 'library') {
         isReorderingLibrary = !isReorderingLibrary;
         const btn = document.getElementById("btnToggleReorderLibrary");
         btn.innerText = isReorderingLibrary ? "Bitti ✓" : "Düzenle";
-        btn.className = isReorderingLibrary ? "text-[11px] bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800/80 text-zinc-400 px-3 py-1.5 rounded-xl font-bold";
+        btn.className = isReorderingLibrary ? "text-[11px] bg-blue-600 text-white px-3 py-1.5 rounded-xl font-bold" : "text-[11px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-xl font-bold";
         renderLibrary();
       }
     }
@@ -434,6 +430,7 @@
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
+      document.getElementById("floatingExerciseBubble").classList.remove("hidden"); // Ana sayfada baloncuk açılır
       
       const vHome = document.getElementById("viewHome");
       vHome.classList.remove("hidden");
@@ -449,6 +446,7 @@
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
+      document.getElementById("floatingExerciseBubble").classList.add("hidden"); // Antrenmanda baloncuk gizlenir
 
       const vWorkout = document.getElementById("viewWorkout");
       vWorkout.classList.remove("hidden");
@@ -528,7 +526,7 @@
       }
     }
 
-    // --- ANTRENMAN MODU ---
+    // --- ANTRENMAN MODU (SIRALAMA DÜZENLEME & ÇIKIŞSIZ NET ARAYÜZ) ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -546,7 +544,6 @@
             <p class="text-[11px] text-zinc-600 font-medium">Alttaki butona basarak hareket ekleyebilirsin.</p>
           </div>
         `;
-        updateCompletedCounter();
         return;
       }
 
@@ -570,7 +567,6 @@
         card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
 
-        // Uzun basma olayı (mavi kutu olmadan modu açar)
         attachLongPress(card, () => {
           if (!isReorderingRoutine) toggleReorderMode('routine');
         });
@@ -607,12 +603,11 @@
               <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
             </div>
 
-            <!-- Düzenleme Modu Kontrolleri (Çarpı kalktı, sadece düzenleme modunda kontroller var) -->
             ${isReorderingRoutine ? `
               <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▲</button>
-                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▼</button>
-                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1">🗑️</button>
+                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
+                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
+                <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
               </div>
             ` : ''}
           </div>
@@ -635,7 +630,6 @@
         `;
         container.appendChild(card);
       });
-      updateCompletedCounter();
     }
 
     function moveRoutineExercise(index, direction) {
@@ -710,24 +704,13 @@
       renderWorkout(false);
     }
 
-    function updateCompletedCounter() {
-      const current = routines.find(r => r.id === currentRoutineId);
-      let totalDone = 0;
-      if (current && routineSets[currentRoutineId]) {
-        current.exerciseIds.forEach(exId => {
-          const sets = routineSets[currentRoutineId][exId] || [];
-          sets.forEach(s => { if (s.done) totalDone++; });
-        });
-      }
-      document.getElementById("completedCounter").innerText = `${totalDone} Set`;
-    }
-
     // --- TÜM EGZERSİZ HAVUZU / KÜTÜPHANE SAYFASI ---
     function openLibraryPage() {
       document.getElementById("viewHome").classList.add("hidden");
       document.getElementById("viewWorkout").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
+      document.getElementById("floatingExerciseBubble").classList.add("hidden");
 
       const vLib = document.getElementById("viewLibrary");
       vLib.classList.remove("hidden");
@@ -784,9 +767,9 @@
           
           ${isReorderingLibrary ? `
             <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▲</button>
-              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-xs font-bold active:scale-90">▼</button>
-              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1">🗑️</button>
+              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
+              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
+              <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
             </div>
           ` : `
             <div class="text-right font-num">
