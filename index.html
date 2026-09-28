@@ -48,6 +48,7 @@
       touch-action: none;
     }
 
+    /* Akıcı Animasyonlar */
     @keyframes pageSlideIn {
       from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
@@ -78,6 +79,16 @@
       100% { transform: rotate(-0.8deg); }
     }
 
+    /* Yer değiştirme hafif yaylanma animasyonları */
+    @keyframes slideSwapUp {
+      0% { transform: translateY(24px); opacity: 0.7; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideSwapDown {
+      0% { transform: translateY(-24px); opacity: 0.7; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
     .anim-forward { animation: pageSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-back { animation: pageSlideBack 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-card { animation: cardFadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -85,6 +96,9 @@
     .anim-sheet { animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
     .wiggle { animation: wiggleEffect 0.24s ease-in-out infinite; }
+    
+    .anim-swap-up { animation: slideSwapUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .anim-swap-down { animation: slideSwapDown 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
     .tap-press {
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -94,7 +108,6 @@
       opacity: 0.85;
     }
 
-    /* Ekranın En Sağ Altına Kesinlikle Sabit Baloncuk */
     .screen-fab-fixed {
       position: fixed !important;
       bottom: calc(var(--sab) + 20px) !important;
@@ -120,7 +133,6 @@
     <div id="routineCardList" class="mt-4 space-y-3"></div>
   </div>
 
-
   <!-- EKRANIN EN SAĞ ALTINA SABİTLENMİŞ BAĞIMSIZ BALONCUK -->
   <div id="floatingExerciseBubble" class="screen-fab-fixed">
     <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900 border border-zinc-700 hover:border-blue-500 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl active:scale-90">
@@ -135,7 +147,6 @@
       </svg>
     </button>
   </div>
-
 
   <!-- ================= SAYFA 2: AKTİF ANTRENMAN EKRANI ================= -->
   <div id="viewWorkout" class="hidden px-3 max-w-md mx-auto">
@@ -168,7 +179,6 @@
     </div>
   </div>
 
-
   <!-- ================= SAYFA 3: TÜM EGZERSİZLER HAVUZU ================= -->
   <div id="viewLibrary" class="hidden px-4 max-w-md mx-auto">
     <header class="py-4 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
@@ -195,7 +205,6 @@
 
     <div id="libraryListContainer" class="mt-3 space-y-2.5 mb-8"></div>
   </div>
-
 
   <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI ================= -->
   <div id="viewLibraryDetail" class="hidden px-4 max-w-md mx-auto">
@@ -240,7 +249,6 @@
     </section>
   </div>
 
-
   <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI ================= -->
   <div id="viewWorkoutExerciseDetail" class="hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
@@ -271,8 +279,8 @@
         <div class="w-10 h-10 rounded-full bg-rose-600/20 text-rose-500 flex items-center justify-center text-base mb-2">
           ▶
         </div>
-        <p class="text-xs font-bold text-white" id="workoutVideoLabel">Video Bağlantısı</p>
-        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel form rehberi eklenebilir.</p>
+        <p class="text-xs font-bold text-white" id="workoutVideoLabel">Video Rehberi</p>
+        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel video linkleri eklenebilir.</p>
       </div>
     </section>
 
@@ -284,7 +292,6 @@
       <div id="workoutExHistoryList" class="space-y-2"></div>
     </section>
   </div>
-
 
   <!-- ================= POPUPLAR ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
@@ -351,17 +358,31 @@
 
 
   <script>
-    let globalExercisePool = JSON.parse(localStorage.getItem("fit_pool")) || [
-      { id: "sp", name: "Shoulder Press", muscle: "Omuz" },
-      { id: "clr", name: "Cable Lateral Raise", muscle: "Omuz" },
+    // İSTEDİĞİN GÜNCEL STANDART HAREKET LİSTESİ
+    const defaultExercisePool = [
       { id: "bp", name: "Bench Press", muscle: "Göğüs" },
-      { id: "cf", name: "Cable Fly", muscle: "Göğüs" },
-      { id: "scr", name: "Seated Cable Row", muscle: "Sırt" },
+      { id: "cf", name: "Chest Fly", muscle: "Göğüs" },
+      { id: "salr", name: "Single Arm Lateral Raise", muscle: "Omuz" },
+      { id: "sspm", name: "Seated Shoulder Press (Machine)", muscle: "Omuz" },
+      { id: "scrvg", name: "Seated Cable Row (V Grip)", muscle: "Sırt" },
       { id: "lp", name: "Lat Pulldown", muscle: "Sırt" },
-      { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Triceps" },
-      { id: "btk", name: "Biceps Tek Kol", muscle: "Biceps" }
+      { id: "oteb", name: "Overhead Triceps Extension (Bar)", muscle: "Triceps" },
+      { id: "bcc", name: "Back Curl (Cable)", muscle: "Biceps" }
     ];
 
+    // Yerel depodaki havuzu yeni listeyle birleştir/güncelle
+    let savedPool = JSON.parse(localStorage.getItem("fit_pool")) || [];
+    defaultExercisePool.forEach(defEx => {
+      const exists = savedPool.some(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
+      if (!exists) {
+        savedPool.push(defEx);
+      }
+    });
+    // Eğer havuz sıfırsa doğrudan varsayılanı ata
+    if (savedPool.length === 0) savedPool = [...defaultExercisePool];
+    localStorage.setItem("fit_pool", JSON.stringify(savedPool));
+
+    let globalExercisePool = savedPool;
     let routines = JSON.parse(localStorage.getItem("fit_routines")) || [];
     let currentRoutineId = null;
     let selectedDetailExId = null;
@@ -371,6 +392,10 @@
     let isReorderingRoutine = false;
     let isReorderingLibrary = false;
     let longPressTimer = null;
+
+    // Yer değiştirirken anlık animasyon tetiklemek için tutulan id'ler
+    let animatedMoveExId = null;
+    let animatedMoveDirection = null; // 'up' veya 'down'
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
@@ -430,7 +455,7 @@
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      document.getElementById("floatingExerciseBubble").classList.remove("hidden"); // Ana sayfada baloncuk açılır
+      document.getElementById("floatingExerciseBubble").classList.remove("hidden");
       
       const vHome = document.getElementById("viewHome");
       vHome.classList.remove("hidden");
@@ -446,7 +471,7 @@
       document.getElementById("viewLibrary").classList.add("hidden");
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
-      document.getElementById("floatingExerciseBubble").classList.add("hidden"); // Antrenmanda baloncuk gizlenir
+      document.getElementById("floatingExerciseBubble").classList.add("hidden");
 
       const vWorkout = document.getElementById("viewWorkout");
       vWorkout.classList.remove("hidden");
@@ -526,7 +551,7 @@
       }
     }
 
-    // --- ANTRENMAN MODU (SIRALAMA DÜZENLEME & ÇIKIŞSIZ NET ARAYÜZ) ---
+    // --- ANTRENMAN MODU (SIRALAMA ANİMASYONLU) ---
     function renderWorkout(animate = false) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return goHome();
@@ -563,8 +588,14 @@
         const hist = getHistory(exId);
         const lastRec = hist[hist.length - 1];
 
+        // Kartın kayma animasyon sınıfını belirle
+        let moveAnimClass = "";
+        if (animatedMoveExId === exId) {
+          moveAnimClass = animatedMoveDirection === 'up' ? 'anim-swap-up' : 'anim-swap-down';
+        }
+
         const card = document.createElement("div");
-        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''}`;
+        card.className = `bg-zinc-950 border border-zinc-800/80 rounded-[24px] p-4 shadow-md transition ${animate ? 'anim-card' : ''} ${isReorderingRoutine ? 'wiggle border-blue-500/50' : ''} ${moveAnimClass}`;
         if (animate) card.style.animationDelay = `${exIndex * 40}ms`;
 
         attachLongPress(card, () => {
@@ -605,8 +636,8 @@
 
             ${isReorderingRoutine ? `
               <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-                <button onclick="moveRoutineExercise(${exIndex}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
-                <button onclick="moveRoutineExercise(${exIndex}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
+                <button onclick="moveRoutineExercise(${exIndex}, -1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
+                <button onclick="moveRoutineExercise(${exIndex}, 1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
                 <button onclick="removeExerciseFromRoutine('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
               </div>
             ` : ''}
@@ -630,9 +661,13 @@
         `;
         container.appendChild(card);
       });
+
+      // Animasyon tetiklendikten sonra temizle
+      animatedMoveExId = null;
+      animatedMoveDirection = null;
     }
 
-    function moveRoutineExercise(index, direction) {
+    function moveRoutineExercise(index, direction, exId) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return;
       const targetIndex = index + direction;
@@ -641,6 +676,9 @@
       const temp = routine.exerciseIds[index];
       routine.exerciseIds[index] = routine.exerciseIds[targetIndex];
       routine.exerciseIds[targetIndex] = temp;
+
+      animatedMoveExId = exId;
+      animatedMoveDirection = direction === -1 ? 'up' : 'down';
 
       saveRoutines();
       renderWorkout(false);
@@ -747,8 +785,13 @@
         const hist = getHistory(ex.id);
         const maxKg = getMaxKg(hist);
 
+        let moveAnimClass = "";
+        if (animatedMoveExId === ex.id) {
+          moveAnimClass = animatedMoveDirection === 'up' ? 'anim-swap-up' : 'anim-swap-down';
+        }
+
         const card = document.createElement("div");
-        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md transition ${isReorderingLibrary ? 'wiggle border-blue-500/50' : ''}`;
+        card.className = `tap-press bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl flex items-center justify-between cursor-pointer anim-card shadow-md transition ${isReorderingLibrary ? 'wiggle border-blue-500/50' : ''} ${moveAnimClass}`;
         card.style.animationDelay = `${idx * 20}ms`;
 
         attachLongPress(card, () => {
@@ -767,8 +810,8 @@
           
           ${isReorderingLibrary ? `
             <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
-              <button onclick="moveLibraryExercise(${idx}, -1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
-              <button onclick="moveLibraryExercise(${idx}, 1)" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
+              <button onclick="moveLibraryExercise(${idx}, -1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▲</button>
+              <button onclick="moveLibraryExercise(${idx}, 1, '${ex.id}')" class="w-8 h-8 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl text-xs font-bold active:scale-90 flex items-center justify-center">▼</button>
               <button onclick="deleteGlobalExercise('${ex.id}')" class="w-8 h-8 bg-rose-600/20 border border-rose-500/30 text-rose-400 rounded-xl text-xs font-bold active:scale-90 ml-1 flex items-center justify-center">🗑️</button>
             </div>
           ` : `
@@ -780,15 +823,21 @@
         `;
         container.appendChild(card);
       });
+
+      animatedMoveExId = null;
+      animatedMoveDirection = null;
     }
 
-    function moveLibraryExercise(index, direction) {
+    function moveLibraryExercise(index, direction, exId) {
       const targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= globalExercisePool.length) return;
 
       const temp = globalExercisePool[index];
       globalExercisePool[index] = globalExercisePool[targetIndex];
       globalExercisePool[targetIndex] = temp;
+
+      animatedMoveExId = exId;
+      animatedMoveDirection = direction === -1 ? 'up' : 'down';
 
       savePool();
       renderLibrary();
@@ -802,7 +851,7 @@
       }
     }
 
-    // --- KÜTÜPHANE DETAYI (SADECE İSTATİSTİK) ---
+    // --- KÜTÜPHANE DETAYI ---
     function openLibraryDetail(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -835,7 +884,7 @@
       openLibraryPage();
     }
 
-    // --- PROGRAM İÇİ DETAY SAYFASI (NOT + VİDEO + GEÇMİŞ) ---
+    // --- PROGRAM İÇİ DETAY SAYFASI ---
     function openWorkoutExerciseDetail(exId) {
       selectedDetailExId = exId;
       const ex = globalExercisePool.find(e => e.id === exId);
