@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark">
+<html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Antrenman Takip</title>
@@ -10,123 +10,113 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
-      --sat: env(safe-area-inset-top, 24px);
+      --sat: env(safe-area-inset-top, 44px);
     }
-    html, body {
-      max-width: 100vw;
-      overflow-x: hidden;
+    body {
+      padding-top: var(--sat);
       background-color: #000000;
+      color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
-    }
-    .safe-top {
-      padding-top: calc(var(--sat) + 14px) !important;
-    }
-    input, select, button {
-      font-size: 13px !important;
+      user-select: none;
     }
   </style>
 </head>
-<body class="bg-black text-zinc-100 min-h-screen pb-32 font-sans select-none antialiased">
+<body class="min-h-screen pb-32">
 
-  <!-- Üst Bar & Rutin Seçici -->
-  <header class="safe-top px-4 pb-3 border-b border-zinc-900 bg-black/95 backdrop-blur-md sticky top-0 z-40">
-    <div class="flex justify-between items-center mb-2.5">
-      <div class="flex items-center gap-2">
-        <h1 id="currentRoutineName" class="text-lg font-bold text-white tracking-tight">Program Seçilmedi</h1>
-        <button onclick="createNewRoutine()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-2.5 py-1 rounded-lg active:scale-95 transition">+ Yeni Program</button>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <span id="completedCounter" class="text-[11px] bg-zinc-800 text-zinc-400 border border-zinc-700 px-2.5 py-0.5 rounded-full font-mono font-semibold">0 Set</span>
-        <button onclick="resetAllData()" title="Hafızayı Sıfırla" class="text-[10px] text-zinc-500 hover:text-rose-400 p-1">🗑️</button>
-      </div>
+  <!-- Üst Bar (iPhone Çentik Uyumlu) -->
+  <header class="px-4 py-3 border-b border-zinc-900 bg-black/95 sticky top-0 z-30 flex justify-between items-center">
+    <div>
+      <h1 id="currentRoutineName" class="text-lg font-bold text-white leading-tight">Program Yok</h1>
+      <p class="text-[10px] text-zinc-500">iPhone 13 Görünümü</p>
     </div>
-
-    <!-- Rutin Sekmeleri -->
-    <div id="routineTabs" class="flex gap-1.5 overflow-x-auto pb-1 text-xs font-medium no-scrollbar"></div>
+    <div class="flex items-center gap-2">
+      <button onclick="createNewRoutine()" class="text-xs bg-blue-600 active:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm">+ Yeni Program</button>
+      <button onclick="forceCleanReload()" title="Telefonda Yenile" class="text-xs bg-zinc-800 text-zinc-400 p-1.5 rounded-lg">🔄</button>
+    </div>
   </header>
 
-  <div class="w-full max-w-md mx-auto px-3">
+  <!-- Rutin Sekmeleri -->
+  <div id="routineTabs" class="flex gap-2 px-4 py-2 border-b border-zinc-900 overflow-x-auto text-xs font-semibold no-scrollbar"></div>
 
-    <!-- Standart Anatomik Kas Modeli Kartı -->
-    <section class="mt-3 bg-white text-zinc-900 rounded-2xl p-4 shadow-xl border border-zinc-200">
-      <div class="flex justify-between items-center mb-3">
-        <span class="text-[10px] font-extrabold tracking-wider text-zinc-500 uppercase">HEDEF KAS ANATOMİSİ</span>
-        <span class="text-[10px] font-bold text-rose-600 font-mono" id="activeMuscleLabel">STANDART ANATOMİ</span>
+  <div class="px-3 max-w-md mx-auto">
+
+    <!-- Hevy Tarzı Beyaz Zeminli Anatomik Adam Kartı -->
+    <section class="mt-3 bg-white rounded-2xl p-3 shadow-lg border border-zinc-200 text-zinc-900">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <span class="text-[10px] font-black tracking-wider text-zinc-400 uppercase">HEDEF KASLAR</span>
+        <span id="activeMuscleLabel" class="text-[10px] font-bold text-blue-600 font-mono">Tüm Vücut</span>
       </div>
 
-      <!-- Ön & Arka Vücut Anatomik Çizimi -->
-      <div class="flex justify-around items-center bg-zinc-50 border border-zinc-200 rounded-xl p-2 relative overflow-hidden">
-        
-        <!-- Ön Anatomi -->
-        <div class="flex flex-col items-center relative">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ÖN GÖVDE</span>
-          <div class="relative w-28 h-48 flex items-center justify-center">
-            <!-- Temel Kaslı Vücut Katmanı -->
-            <img id="frontBodyImg" src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507693998816-4N72U4O3FOPW6R91P896/male-muscles-front.png" 
-                 onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3043/3043888.png';" 
-                 class="w-full h-full object-contain filter grayscale contrast-125 transition-all duration-300" alt="Ön Kas Anatomisi">
-            <!-- Aktif Kırmızı Vurgu Efekti -->
-            <div id="frontHighlight" class="absolute inset-0 pointer-events-none mix-blend-multiply opacity-0 transition-opacity duration-300 bg-rose-500/30 rounded-lg"></div>
+      <!-- İstediğin Medikal Kaslı Adam Görselleri (Ön & Arka) -->
+      <div class="grid grid-cols-2 gap-2 bg-zinc-50 border border-zinc-200/80 rounded-xl p-2 items-center">
+        <!-- Ön Görünüş -->
+        <div class="flex flex-col items-center">
+          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ÖN</span>
+          <div class="relative w-28 h-44 flex items-center justify-center overflow-hidden">
+            <img id="frontBodyImg" 
+                 src="https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg" 
+                 onerror="this.src='https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507693998816-4N72U4O3FOPW6R91P896/male-muscles-front.png'" 
+                 class="w-full h-full object-contain filter contrast-125" alt="Ön Kas">
           </div>
         </div>
 
-        <!-- Arka Anatomi -->
-        <div class="flex flex-col items-center border-l border-zinc-200 pl-4 relative">
-          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ARKA GÖVDE</span>
-          <div class="relative w-28 h-48 flex items-center justify-center">
-            <img id="backBodyImg" src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507694000302-36I1P6P085P7J68U9W36/male-muscles-back.png" 
-                 onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3043/3043890.png';" 
-                 class="w-full h-full object-contain filter grayscale contrast-125 transition-all duration-300" alt="Arka Kas Anatomisi">
-            <div id="backHighlight" class="absolute inset-0 pointer-events-none mix-blend-multiply opacity-0 transition-opacity duration-300 bg-rose-500/30 rounded-lg"></div>
+        <!-- Arka Görünüş -->
+        <div class="flex flex-col items-center border-l border-zinc-200 pl-2">
+          <span class="text-[9px] font-extrabold text-zinc-400 mb-1">ARKA</span>
+          <div class="relative w-28 h-44 flex items-center justify-center overflow-hidden">
+            <img id="backBodyImg" 
+                 src="https://images.squarespace-cdn.com/content/v1/599e69c1be42d0577e383162/1507694000302-36I1P6P085P7J68U9W36/male-muscles-back.png" 
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3043/3043890.png'" 
+                 class="w-full h-full object-contain filter contrast-125" alt="Arka Kas">
           </div>
         </div>
-
       </div>
 
-      <!-- Kas Sayaçları -->
-      <div class="grid grid-cols-4 gap-1.5 mt-3 text-center font-mono">
-        <div class="bg-zinc-100 border border-zinc-200 p-1.5 rounded-lg">
+      <!-- Set Sayaçları -->
+      <div class="grid grid-cols-4 gap-1 mt-2 text-center font-mono">
+        <div class="bg-zinc-100 p-1 rounded-lg">
           <span class="block text-[8px] text-zinc-500 font-sans font-bold">GÖĞÜS</span>
-          <span id="cnt-gogus" class="text-xs font-bold text-zinc-800">0 Set</span>
+          <span id="cnt-gogus" class="text-xs font-bold text-zinc-800">0</span>
         </div>
-        <div class="bg-zinc-100 border border-zinc-200 p-1.5 rounded-lg">
+        <div class="bg-zinc-100 p-1 rounded-lg">
           <span class="block text-[8px] text-zinc-500 font-sans font-bold">OMUZ</span>
-          <span id="cnt-omuz" class="text-xs font-bold text-zinc-800">0 Set</span>
+          <span id="cnt-omuz" class="text-xs font-bold text-zinc-800">0</span>
         </div>
-        <div class="bg-zinc-100 border border-zinc-200 p-1.5 rounded-lg">
+        <div class="bg-zinc-100 p-1 rounded-lg">
           <span class="block text-[8px] text-zinc-500 font-sans font-bold">SIRT</span>
-          <span id="cnt-sirt" class="text-xs font-bold text-zinc-800">0 Set</span>
+          <span id="cnt-sirt" class="text-xs font-bold text-zinc-800">0</span>
         </div>
-        <div class="bg-zinc-100 border border-zinc-200 p-1.5 rounded-lg">
+        <div class="bg-zinc-100 p-1 rounded-lg">
           <span class="block text-[8px] text-zinc-500 font-sans font-bold">KOL</span>
-          <span id="cnt-kol" class="text-xs font-bold text-zinc-800">0 Set</span>
+          <span id="cnt-kol" class="text-xs font-bold text-zinc-800">0</span>
         </div>
       </div>
     </section>
 
-    <!-- Hareket Listesi Alanı -->
+    <!-- Hareket Listesi -->
     <main id="routineContainer" class="mt-3 space-y-3"></main>
 
-    <!-- Havuzdan Hareket Ekle / Yeni Hareket Oluştur -->
+    <!-- Alt İşlem Butonları -->
     <div id="actionButtons" class="mt-4 space-y-2 hidden">
-      <button onclick="openExerciseSelector()" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20 active:scale-95 transition">
-        <span>+</span> Bu Programa Egzersiz Ekle
+      <button onclick="openExerciseSelector()" class="w-full py-3.5 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center justify-center gap-1 active:bg-blue-700 shadow-md">
+        <span>+</span> Programa Hareket Ekle
       </button>
-      <button onclick="promptCreateNewExercise()" class="w-full py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold text-xs active:bg-zinc-850">
-        Havuzda Olmayan Yeni Hareket Tanımla
+      <button onclick="promptCreateNewExercise()" class="w-full py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold text-xs active:bg-zinc-800">
+        Özel Hareket Oluştur
       </button>
     </div>
   </div>
 
-  <!-- Detay Modalı (Grafik & Geçmiş) -->
-  <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center p-0">
+  <!-- Detay Modalı -->
+  <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center">
     <div class="bg-zinc-900 border-t border-zinc-800 w-full rounded-t-3xl p-4 max-h-[85vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-3">
         <div>
           <h2 id="modalExTitle" class="text-base font-bold text-white leading-tight"></h2>
           <span id="modalExMuscle" class="text-[11px] text-blue-400 font-medium"></span>
         </div>
-        <button onclick="closeDetailModal()" class="text-zinc-400 text-lg font-bold px-2 py-1">✕</button>
+        <button onclick="closeDetailModal()" class="text-zinc-400 text-xl font-bold px-2">✕</button>
       </div>
 
       <div class="bg-black border border-zinc-800 rounded-xl p-2.5 mb-3">
@@ -142,15 +132,15 @@
   </div>
 
   <!-- Egzersiz Seçim Modalı -->
-  <div id="exercisePickerModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center p-0">
+  <div id="exercisePickerModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end justify-center">
     <div class="bg-zinc-900 border-t border-zinc-800 w-full rounded-t-3xl p-4 max-h-[80vh] flex flex-col">
       <div class="flex justify-between items-center mb-2">
-        <h2 class="text-sm font-bold text-white">Egzersiz Havuzundan Seç</h2>
-        <button onclick="closeExerciseSelector()" class="text-zinc-400 text-lg font-bold px-2 py-1">✕</button>
+        <h2 class="text-sm font-bold text-white">Havuzdan Egzersiz Seç</h2>
+        <button onclick="closeExerciseSelector()" class="text-zinc-400 text-xl font-bold px-2">✕</button>
       </div>
       <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 py-1"></div>
       <button onclick="promptCreateNewExercise()" class="mt-2 w-full py-2.5 rounded-xl bg-zinc-800 text-blue-400 text-xs font-bold border border-zinc-700">
-        + Listede Yoksa Yeni Hareket Üret
+        + Yeni Hareket Ekle
       </button>
     </div>
   </div>
@@ -171,28 +161,17 @@
     let currentRoutineId = localStorage.getItem("fit_current_routine") || (routines[0] ? routines[0].id : null);
     let chartInstance = null;
 
-    function resetAllData() {
-      if (confirm("Tüm kayıtları ve programları sıfırlayıp tertemiz boş ekrana dönmek istiyor musun?")) {
+    function forceCleanReload() {
+      if (confirm("Uygulama sıfırlanıp en güncel sürüme yenilensin mi?")) {
         localStorage.clear();
-        location.reload();
+        window.location.reload(true);
       }
     }
 
-    function savePool() {
-      localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool));
-    }
-
-    function saveRoutines() {
-      localStorage.setItem("fit_routines", JSON.stringify(routines));
-    }
-
-    function getHistory(exId) {
-      return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]");
-    }
-
-    function saveHistory(exId, history) {
-      localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history));
-    }
+    function savePool() { localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool)); }
+    function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
+    function getHistory(exId) { return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]"); }
+    function saveHistory(exId, history) { localStorage.setItem(`fit_history_${exId}`, JSON.stringify(history)); }
 
     let activeSets = JSON.parse(localStorage.getItem("fit_active_sets") || "{}");
 
@@ -224,16 +203,14 @@
       routines.forEach(r => {
         const isActive = r.id === currentRoutineId;
         const btn = document.createElement("button");
-        btn.className = `px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${isActive ? 'bg-blue-600 text-white shadow-sm' : 'bg-zinc-900 border border-zinc-800 text-zinc-400'}`;
+        btn.className = `px-3.5 py-1.5 rounded-xl whitespace-nowrap transition border ${isActive ? 'bg-blue-600 border-blue-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400'}`;
         btn.innerText = r.name;
         btn.onclick = () => switchRoutine(r.id);
         container.appendChild(btn);
       });
 
       const current = routines.find(r => r.id === currentRoutineId);
-      if (current) {
-        document.getElementById("currentRoutineName").innerText = current.name;
-      }
+      if (current) document.getElementById("currentRoutineName").innerText = current.name;
     }
 
     function switchRoutine(id) {
@@ -244,7 +221,7 @@
     }
 
     function createNewRoutine() {
-      const name = prompt("Oluşturmak istediğin programın adını yaz (Örn: Upper Body, Bacak, İtiş):");
+      const name = prompt("Program Adı (Örn: Upper Body):");
       if (!name || !name.trim()) return;
 
       const newId = "r_" + Date.now();
@@ -254,19 +231,13 @@
     }
 
     function promptCreateNewExercise() {
-      const name = prompt("Yeni Hareketin Adı (Örn: Incline Dumbbell Press):");
+      const name = prompt("Yeni Hareketin Adı:");
       if (!name || !name.trim()) return;
 
-      const region = prompt("Kas bölgesi? (gogus, omuz, sirt, kol yazabilirsin):", "gogus");
+      const region = prompt("Bölge (gogus, omuz, sirt, kol):", "gogus");
       const tag = region ? region.trim().toLowerCase() : "gogus";
 
-      const newEx = {
-        id: "ex_" + Date.now(),
-        name: name.trim(),
-        muscle: tag.toUpperCase(),
-        tag: tag
-      };
-
+      const newEx = { id: "ex_" + Date.now(), name: name.trim(), muscle: tag.toUpperCase(), tag: tag };
       globalExercisePool.push(newEx);
       savePool();
 
@@ -277,7 +248,6 @@
           saveRoutines();
         }
       }
-
       closeExerciseSelector();
       renderApp();
     }
@@ -291,11 +261,9 @@
       if (routines.length === 0) {
         actionBox.classList.add("hidden");
         container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-800/80 rounded-2xl p-8 text-center mt-4">
-            <div class="w-12 h-12 rounded-full bg-blue-600/10 text-blue-400 font-bold text-xl flex items-center justify-center mx-auto mb-3">🏋️</div>
-            <h3 class="text-sm font-bold text-white mb-1">Henüz Bir Programın Yok</h3>
-            <p class="text-xs text-zinc-400 mb-4">Sağ üstteki veya alttaki butona dokunarak ilk antrenman programını oluşturabilirsin.</p>
-            <button onclick="createNewRoutine()" class="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20">İlk Programını Başlat</button>
+          <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-center mt-3">
+            <h3 class="text-sm font-bold text-white mb-1">Henüz Program Yok</h3>
+            <p class="text-xs text-zinc-400 mb-3">Yukarıdaki "+ Yeni Program" butonuna basarak başla.</p>
           </div>
         `;
         updateAnalytics();
@@ -308,9 +276,9 @@
 
       if (current.exerciseIds.length === 0) {
         container.innerHTML = `
-          <div class="bg-zinc-950 border border-zinc-800/80 rounded-2xl p-6 text-center mt-2">
-            <p class="text-xs text-zinc-400 mb-3">Bu program şu anda boş.</p>
-            <button onclick="openExerciseSelector()" class="px-3.5 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold">Havuzdan Egzersiz Ekle</button>
+          <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-5 text-center mt-2">
+            <p class="text-xs text-zinc-400 mb-2">Bu program henüz boş.</p>
+            <button onclick="openExerciseSelector()" class="px-3 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold">Havuzdan Ekle</button>
           </div>
         `;
         updateAnalytics();
@@ -335,18 +303,14 @@
           setsHtml += `
             <div class="grid grid-cols-[20px_1fr_1fr_48px_32px] gap-1.5 items-center bg-zinc-900/60 p-1.5 rounded-lg border ${isDone ? 'border-blue-500/50 bg-blue-950/20' : 'border-zinc-800/60'}">
               <span class="text-[11px] font-bold ${isDone ? 'text-blue-400' : 'text-zinc-500'} text-center font-mono">${idx + 1}</span>
-              
               <input type="text" placeholder="${lastRec ? lastRec.kg : 'KG'}" value="${set.kg}" onchange="updateSetVal('${ex.id}', ${idx}, 'kg', this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-1 text-center text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-              
               <input type="text" placeholder="${lastRec ? lastRec.reps : 'Tekrar'}" value="${set.reps}" onchange="updateSetVal('${ex.id}', ${idx}, 'reps', this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-1 text-center text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-              
               <select onchange="updateSetVal('${ex.id}', ${idx}, 'type', this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded p-1 text-center text-[10px] font-bold ${set.type === 'F' ? 'text-rose-400' : 'text-zinc-300'} focus:outline-none">
                 <option value="Norm" ${set.type === 'Norm' ? 'selected' : ''}>OK</option>
                 <option value="F" ${set.type === 'F' ? 'selected' : ''}>F</option>
                 <option value="R1" ${set.type === 'R1' ? 'selected' : ''}>R1</option>
                 <option value="R2" ${set.type === 'R2' ? 'selected' : ''}>R2</option>
               </select>
-
               <button onclick="toggleSet('${ex.id}', ${idx})" class="w-8 h-7 rounded font-bold flex items-center justify-center text-xs transition active:scale-95 ${isDone ? 'bg-blue-600 text-white' : 'bg-zinc-800 text-zinc-500'}">✓</button>
             </div>
           `;
@@ -363,14 +327,12 @@
               <button onclick="removeExerciseFromRoutine('${ex.id}')" class="text-zinc-600 hover:text-rose-400 text-xs px-1">✕</button>
             </div>
           </div>
-
           <div class="space-y-1 mb-2">
             <div class="grid grid-cols-[20px_1fr_1fr_48px_32px] gap-1.5 text-zinc-500 font-mono text-[9px] px-1 text-center">
               <span>S</span><span>KG</span><span>REP</span><span>TÜR</span><span>TİK</span>
             </div>
             ${setsHtml}
           </div>
-
           <div class="flex justify-between items-center pt-1 border-t border-zinc-900">
             <button onclick="addSet('${ex.id}')" class="text-[11px] font-semibold text-blue-400 py-0.5 px-1.5">+ Set</button>
             <button onclick="removeSet('${ex.id}')" class="text-[10px] text-zinc-500 hover:text-rose-400 py-0.5 px-1.5">- Sil</button>
@@ -407,11 +369,7 @@
 
     function toggleSet(exId, idx) {
       const set = activeSets[exId][idx];
-      if (!set.kg) {
-        alert("Ağırlık girmelisin!");
-        return;
-      }
-
+      if (!set.kg) { alert("Ağırlık yazmalısın!"); return; }
       set.done = !set.done;
       saveActiveSets();
 
@@ -445,24 +403,17 @@
         const item = document.createElement("div");
         item.className = "flex items-center justify-between p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-xs";
         item.innerHTML = `
-          <div>
-            <p class="font-bold text-white">${ex.name}</p>
-            <p class="text-[10px] text-zinc-500">${ex.muscle}</p>
-          </div>
-          <button onclick="toggleExerciseInRoutine('${ex.id}')" class="px-2.5 py-1 rounded text-xs font-semibold ${isAdded ? 'bg-rose-500/20 text-rose-400' : 'bg-blue-600 text-white'}">
-            ${isAdded ? 'Çıkar' : 'Ekle'}
-          </button>
+          <div><p class="font-bold text-white">${ex.name}</p><p class="text-[10px] text-zinc-500">${ex.muscle}</p></div>
+          <button onclick="toggleExerciseInRoutine('${ex.id}')" class="px-2.5 py-1 rounded text-xs font-semibold ${isAdded ? 'bg-rose-500/20 text-rose-400' : 'bg-blue-600 text-white'}">${isAdded ? 'Çıkar' : 'Ekle'}</button>
         `;
         list.appendChild(item);
       });
-
       modal.classList.remove("hidden");
     }
 
     function toggleExerciseInRoutine(exId) {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
-
       if (current.exerciseIds.includes(exId)) {
         current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
       } else {
@@ -473,13 +424,10 @@
       renderApp();
     }
 
-    function closeExerciseSelector() {
-      document.getElementById("exercisePickerModal").classList.add("hidden");
-    }
+    function closeExerciseSelector() { document.getElementById("exercisePickerModal").classList.add("hidden"); }
 
     function updateAnalytics() {
       const current = routines.find(r => r.id === currentRoutineId);
-      let totalDone = 0;
       let muscleCounts = { gogus: 0, omuz: 0, sirt: 0, kol: 0 };
 
       if (current) {
@@ -488,47 +436,19 @@
           const sets = activeSets[exId] || [];
           sets.forEach(s => {
             if (s.done) {
-              totalDone++;
               if (ex.tag === "gogus") muscleCounts.gogus++;
               if (ex.tag === "omuz") muscleCounts.omuz++;
               if (ex.tag === "sirt") muscleCounts.sirt++;
-              if (ex.tag === "kol" || ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
+              if (ex.tag === "kol") muscleCounts.kol++;
             }
           });
         });
       }
 
-      document.getElementById("completedCounter").innerText = `${totalDone} Set`;
-      document.getElementById("cnt-gogus").innerText = `${muscleCounts.gogus} Set`;
-      document.getElementById("cnt-omuz").innerText = `${muscleCounts.omuz} Set`;
-      document.getElementById("cnt-sirt").innerText = `${muscleCounts.sirt} Set`;
-      document.getElementById("cnt-kol").innerText = `${muscleCounts.kol} Set`;
-
-      // Anatomik Resimde Kırmızı Parlama Efekti
-      const frontActive = (muscleCounts.gogus > 0 || muscleCounts.omuz > 0);
-      const backActive = (muscleCounts.sirt > 0 || muscleCounts.kol > 0);
-
-      document.getElementById("frontHighlight").style.opacity = frontActive ? "1" : "0";
-      document.getElementById("backHighlight").style.opacity = backActive ? "1" : "0";
-
-      const frontImg = document.getElementById("frontBodyImg");
-      const backImg = document.getElementById("backBodyImg");
-
-      if (frontActive) {
-        frontImg.classList.remove("grayscale");
-        frontImg.classList.add("sepia", "hue-rotate-[320deg]");
-      } else {
-        frontImg.classList.add("grayscale");
-        frontImg.classList.remove("sepia", "hue-rotate-[320deg]");
-      }
-
-      if (backActive) {
-        backImg.classList.remove("grayscale");
-        backImg.classList.add("sepia", "hue-rotate-[320deg]");
-      } else {
-        backImg.classList.add("grayscale");
-        backImg.classList.remove("sepia", "hue-rotate-[320deg]");
-      }
+      document.getElementById("cnt-gogus").innerText = muscleCounts.gogus;
+      document.getElementById("cnt-omuz").innerText = muscleCounts.omuz;
+      document.getElementById("cnt-sirt").innerText = muscleCounts.sirt;
+      document.getElementById("cnt-kol").innerText = muscleCounts.kol;
     }
 
     function openDetailModal(exId) {
@@ -543,17 +463,12 @@
       histContainer.innerHTML = "";
 
       if (hist.length === 0) {
-        histContainer.innerHTML = `<p class="text-zinc-500 text-xs py-2 text-center">Henüz tamamlanan set kaydı yok.</p>`;
+        histContainer.innerHTML = `<p class="text-zinc-500 text-xs py-2 text-center">Henüz set kaydı yok.</p>`;
       } else {
         [...hist].reverse().forEach(h => {
           const row = document.createElement("div");
           row.className = "flex justify-between items-center bg-black p-2 rounded border border-zinc-800 text-[11px] font-mono";
-          row.innerHTML = `
-            <span class="text-zinc-500">${h.date}</span>
-            <span class="font-bold text-white">${h.kg} KG</span>
-            <span class="text-zinc-400">${h.reps} Rep</span>
-            <span class="${h.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${h.type}]</span>
-          `;
+          row.innerHTML = `<span class="text-zinc-500">${h.date}</span><span class="font-bold text-white">${h.kg} KG</span><span class="text-zinc-400">${h.reps} Rep</span><span class="${h.type === 'F' ? 'text-rose-400' : 'text-zinc-400'} font-bold">[${h.type}]</span>`;
           histContainer.appendChild(row);
         });
       }
@@ -564,29 +479,21 @@
       const labels = hist.map(h => h.date);
       const dataPoints = hist.map(h => {
         const nums = h.kg.match(/\d+(\.\d+)?/g);
-        if (!nums) return 0;
-        return nums.reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+        return nums ? nums.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) : 0;
       });
 
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels.slice(-8),
-          datasets: [{
-            data: dataPoints.slice(-8),
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true
-          }]
+          datasets: [{ data: dataPoints.slice(-8), borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 2, tension: 0.3, fill: true }]
         },
         options: {
           responsive: true,
           plugins: { legend: { display: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#71717a', font: { size: 9 } } },
-            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 10 } } }
+            y: { grid: { color: '#18181b' }, ticks: { color: '#71717a', font: { size: 9 } } }
           }
         }
       });
@@ -594,9 +501,7 @@
       document.getElementById("detailModal").classList.remove("hidden");
     }
 
-    function closeDetailModal() {
-      document.getElementById("detailModal").classList.add("hidden");
-    }
+    function closeDetailModal() { document.getElementById("detailModal").classList.add("hidden"); }
 
     renderApp();
   </script>
