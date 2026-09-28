@@ -9,17 +9,20 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-black text-zinc-100 min-h-screen pb-28 font-sans select-none">
+<body class="bg-black text-zinc-100 min-h-screen pb-32 font-sans select-none">
 
-  <!-- Üst Bar -->
-  <header class="p-4 pt-6 border-b border-zinc-900 sticky top-0 bg-black/95 backdrop-blur-md z-40 flex justify-between items-center">
-    <div>
-      <h1 class="text-xl font-bold tracking-tight text-white">Upper Body</h1>
-      <p class="text-[11px] text-zinc-400">Omuz, Göğüs, Sırt, Kol</p>
-    </div>
-    <div class="flex items-center gap-2">
+  <!-- Üst Bar & Rutin Seçici -->
+  <header class="p-4 pt-6 border-b border-zinc-900 sticky top-0 bg-black/95 backdrop-blur-md z-40">
+    <div class="flex justify-between items-center mb-3">
+      <div class="flex items-center gap-2">
+        <h1 id="currentRoutineName" class="text-xl font-bold tracking-tight text-white leading-tight">Upper Body</h1>
+        <button onclick="createNewRoutine()" class="text-xs bg-zinc-800 text-zinc-300 hover:text-white px-2 py-1 rounded-lg border border-zinc-700">+ Rutin</button>
+      </div>
       <span id="completedCounter" class="text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1 rounded-full font-semibold font-mono">0 Set Tamam</span>
     </div>
+
+    <!-- Rutin Sekmeleri (Yatay Kaydırılabilir) -->
+    <div id="routineTabs" class="flex gap-2 overflow-x-auto pb-1 text-xs font-semibold scrollbar-none"></div>
   </header>
 
   <!-- Kas Haritası & Dağılım Kartı -->
@@ -27,24 +30,18 @@
     <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
         <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Hedef Kas Haritası</h2>
-        <span class="text-[10px] text-zinc-500">Set tamamlandıkça parlar</span>
+        <span class="text-[10px] text-zinc-500">Tamamlanan setler parlar</span>
       </div>
 
-      <!-- Vücut Silüeti & Kas Göstergeleri (SVG Tabanlı) -->
       <div class="grid grid-cols-2 gap-4 items-center bg-zinc-900/60 p-3 rounded-xl border border-zinc-800/80">
         <!-- Ön Vücut -->
         <div class="flex flex-col items-center">
           <span class="text-[10px] text-zinc-500 font-bold mb-1">ÖN GÖVDE</span>
-          <svg class="w-24 h-40" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
-            <!-- Kafa -->
+          <svg class="w-24 h-36" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
             <circle cx="50" cy="18" r="10" stroke="#3f3f46" fill="#18181b"/>
-            <!-- Omuzlar -->
             <path id="muscle-omuz-on" d="M30 35 Q50 30 70 35 L76 48 Q50 44 24 48 Z" fill="#27272a" class="transition-colors duration-300"/>
-            <!-- Göğüs -->
             <path id="muscle-gogus" d="M32 46 Q50 48 68 46 L66 65 Q50 68 34 65 Z" fill="#27272a" class="transition-colors duration-300"/>
-            <!-- Karın -->
             <path d="M36 67 Q50 69 64 67 L61 95 Q50 97 39 95 Z" fill="#18181b"/>
-            <!-- Biceps (Ön Kol) -->
             <rect id="muscle-biceps" x="18" y="52" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
             <rect id="muscle-biceps-2" x="74" y="52" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
           </svg>
@@ -53,22 +50,18 @@
         <!-- Arka Vücut -->
         <div class="flex flex-col items-center border-l border-zinc-800 pl-3">
           <span class="text-[10px] text-zinc-500 font-bold mb-1">ARKA GÖVDE</span>
-          <svg class="w-24 h-40" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
-            <!-- Kafa -->
+          <svg class="w-24 h-36" viewBox="0 0 100 160" fill="none" stroke="#27272a" stroke-width="1.5">
             <circle cx="50" cy="18" r="10" stroke="#3f3f46" fill="#18181b"/>
-            <!-- Trapez / Üst Sırt -->
             <path id="muscle-sirt" d="M32 35 Q50 40 68 35 L74 68 Q50 72 26 68 Z" fill="#27272a" class="transition-colors duration-300"/>
-            <!-- Triceps (Arka Kol) -->
             <rect id="muscle-triceps" x="17" y="48" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
             <rect id="muscle-triceps-2" x="75" y="48" width="8" height="22" rx="4" fill="#27272a" class="transition-colors duration-300"/>
-            <!-- Alt Sırt -->
             <path d="M37 72 Q50 74 63 72 L60 95 Q50 97 40 95 Z" fill="#18181b"/>
           </svg>
         </div>
       </div>
 
-      <!-- Bölgesel Set Sayaçları -->
-      <div id="muscleTags" class="grid grid-cols-4 gap-1.5 mt-3 text-center font-mono">
+      <!-- Sayaçlar -->
+      <div class="grid grid-cols-4 gap-1.5 mt-3 text-center font-mono">
         <div class="bg-black/50 border border-zinc-800 p-1.5 rounded-lg">
           <span class="block text-[9px] text-zinc-500">GÖĞÜS</span>
           <span id="cnt-gogus" class="text-xs font-bold text-zinc-400">0 Set</span>
@@ -92,6 +85,26 @@
   <!-- Egzersiz Listesi -->
   <main id="routineContainer" class="p-3 space-y-4 max-w-lg mx-auto"></main>
 
+  <!-- Buton: Programa Egzersiz Ekle -->
+  <div class="max-w-lg mx-auto px-3 mt-4">
+    <button onclick="openExerciseSelector()" class="w-full py-3 rounded-2xl bg-zinc-900 border border-zinc-800 text-blue-400 font-bold text-xs flex items-center justify-center gap-2 hover:bg-zinc-850 active:scale-[0.99] transition shadow-md">
+      <span>+</span> Bu Rutine Havuzdan Egzersiz Ekle
+    </button>
+  </div>
+
+  <!-- Egzersiz Seçim Modalı -->
+  <div id="exercisePickerModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-zinc-900 border border-zinc-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-base font-bold text-white">Egzersiz Havuzu</h2>
+        <button onclick="closeExerciseSelector()" class="text-zinc-400 hover:text-white text-xl font-bold p-1">✕</button>
+      </div>
+      <p class="text-[11px] text-zinc-400 mb-3">Programa eklemek istediğin hareketleri seç:</p>
+      
+      <div id="pickerList" class="space-y-2 overflow-y-auto flex-1 pr-1"></div>
+    </div>
+  </div>
+
   <!-- Detay Modalı (Grafik, YouTube & Geçmiş) -->
   <div id="detailModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-zinc-900 border border-zinc-800 w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto">
@@ -103,7 +116,6 @@
         <button onclick="closeDetailModal()" class="text-zinc-400 hover:text-white text-xl font-bold p-1">✕</button>
       </div>
 
-      <!-- YouTube Zaman Ayarlı Video Linki -->
       <div id="videoContainer" class="mb-4">
         <a id="videoLink" href="#" target="_blank" class="flex items-center justify-between bg-zinc-800/80 border border-zinc-700 hover:border-blue-500 p-3 rounded-xl text-xs text-zinc-200 transition">
           <span class="flex items-center gap-2.5 font-medium">
@@ -113,13 +125,11 @@
         </a>
       </div>
 
-      <!-- İlerleme Grafiği -->
       <div class="bg-black border border-zinc-800 rounded-xl p-3 mb-4">
         <h4 class="text-[11px] font-semibold text-zinc-400 mb-2 tracking-wide">AĞIRLIK GELİŞİM GRAFİĞİ (KG)</h4>
         <canvas id="exerciseChart" height="170"></canvas>
       </div>
 
-      <!-- Geçmiş Kayıtlar -->
       <div>
         <h3 class="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Tüm Antrenman Geçmişi</h3>
         <div id="historyList" class="space-y-1.5 max-h-48 overflow-y-auto text-xs"></div>
@@ -128,19 +138,30 @@
   </div>
 
   <script>
-    // Ortak Egzersiz Havuzu (Kas grupları hedef kas haritası için etiketlendi)
-    const exercisePool = [
+    // MERKEZİ EGZERSİZ HAVUZU (Tüm rutinler bu ortak havuzu kullanır)
+    const globalExercisePool = [
       { id: "sp", name: "Shoulder Press", muscle: "Omuz (Ön/Yan)", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=qEwKCR5JCog&t=45s", time: "00:45" },
       { id: "clr", name: "Cable Lateral Raise", muscle: "Yan Omuz", tag: "omuz", videoUrl: "https://www.youtube.com/watch?v=PPrzBWZDOhA&t=30s", time: "00:30" },
       { id: "bp", name: "Bench Press", muscle: "Göğüs, Ön Omuz, Triceps", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=rT7DgCr-3pg&t=60s", time: "01:00" },
-      { id: "cf", name: "Cable Fly", muscle: "Göğüs", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o&t=20s", time: "00:20" },
+      { id: "cf", name: "Cable Fly", muscle: "İç / Orta Göğüs", tag: "gogus", videoUrl: "https://www.youtube.com/watch?v=Iwe6AmxVf7o&t=20s", time: "00:20" },
       { id: "scr", name: "Seated Cable Row", muscle: "Sırt, Lat, Rhomboid", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=GZbfZ033f74&t=15s", time: "00:15" },
       { id: "lp", name: "Lat Pulldown", muscle: "Üst Sırt, Kanat", tag: "sirt", videoUrl: "https://www.youtube.com/watch?v=CAwf7n6Luuc&t=40s", time: "00:40" },
       { id: "tb", name: "Triceps Bar Baş Üstü", muscle: "Arka Kol (Triceps)", tag: "triceps", videoUrl: "https://www.youtube.com/watch?v=b_Xhx2qS3oU&t=25s", time: "00:25" },
       { id: "btk", name: "Biceps Tek Kol", muscle: "Ön Kol (Biceps)", tag: "biceps", videoUrl: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo&t=10s", time: "00:10" }
     ];
 
+    // RUTİN LİSTESİ (Kullanıcı yeni rutin ekleyebilir, silebilir)
+    let routines = JSON.parse(localStorage.getItem("fit_routines")) || [
+      { id: "upper", name: "Upper Body", exerciseIds: ["sp", "clr", "bp", "cf", "scr", "lp", "tb", "btk"] },
+      { id: "push", name: "Push (İtiş)", exerciseIds: ["bp", "cf", "sp", "clr", "tb"] }
+    ];
+
+    let currentRoutineId = localStorage.getItem("fit_current_routine") || routines[0].id;
     let chartInstance = null;
+
+    function saveRoutines() {
+      localStorage.setItem("fit_routines", JSON.stringify(routines));
+    }
 
     function getHistory(exId) {
       return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]");
@@ -157,27 +178,72 @@
       updateAnalytics();
     }
 
-    function initActiveSets() {
-      exercisePool.forEach(ex => {
-        if (!activeSets[ex.id]) {
-          const hist = getHistory(ex.id);
-          const last = hist[hist.length - 1];
-          activeSets[ex.id] = [
-            { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "Norm", done: false },
-            { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "F", done: false }
-          ];
-        }
-      });
-      saveActiveSets();
+    function initActiveSetsForExercise(exId) {
+      if (!activeSets[exId]) {
+        const hist = getHistory(exId);
+        const last = hist[hist.length - 1];
+        activeSets[exId] = [
+          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "Norm", done: false },
+          { kg: last ? last.kg : "", reps: last ? last.reps : "", type: "F", done: false }
+        ];
+      }
     }
 
+    // Rutin Sekmelerini Çiz
+    function renderTabs() {
+      const tabsContainer = document.getElementById("routineTabs");
+      tabsContainer.innerHTML = "";
+
+      routines.forEach(r => {
+        const isActive = r.id === currentRoutineId;
+        const btn = document.createElement("button");
+        btn.className = `px-3.5 py-1.5 rounded-xl whitespace-nowrap transition border ${isActive ? 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-600/30' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'}`;
+        btn.innerText = r.name;
+        btn.onclick = () => switchRoutine(r.id);
+        tabsContainer.appendChild(btn);
+      });
+
+      const current = routines.find(r => r.id === currentRoutineId) || routines[0];
+      document.getElementById("currentRoutineName").innerText = current.name;
+    }
+
+    function switchRoutine(id) {
+      currentRoutineId = id;
+      localStorage.setItem("fit_current_routine", id);
+      renderTabs();
+      renderApp();
+    }
+
+    function createNewRoutine() {
+      const name = prompt("Yeni Rutin Adını Yazın (Örn: Bacak / Karın veya Full Body):");
+      if (!name || !name.trim()) return;
+
+      const newId = "routine_" + Date.now();
+      routines.push({ id: newId, name: name.trim(), exerciseIds: [] });
+      saveRoutines();
+      switchRoutine(newId);
+    }
+
+    // Uygulama Ana Sayfasını Çiz
     function renderApp() {
+      renderTabs();
+      const current = routines.find(r => r.id === currentRoutineId) || routines[0];
       const container = document.getElementById("routineContainer");
       container.innerHTML = "";
 
-      exercisePool.forEach(ex => {
-        const sets = activeSets[ex.id] || [];
-        const hist = getHistory(ex.id);
+      if (current.exerciseIds.length === 0) {
+        container.innerHTML = `<div class="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 text-center text-xs text-zinc-400">Bu rutinde henüz hareket yok. Alttaki butonla havuzdan egzersiz ekle!</div>`;
+        updateAnalytics();
+        return;
+      }
+
+      current.exerciseIds.forEach(exId => {
+        const ex = globalExercisePool.find(e => e.id === exId);
+        if (!ex) return;
+
+        initActiveSetsForExercise(exId);
+        const sets = activeSets[exId] || [];
+        const hist = getHistory(exId);
         const lastRec = hist[hist.length - 1];
 
         const card = document.createElement("div");
@@ -206,8 +272,8 @@
         });
 
         card.innerHTML = `
-          <div class="flex items-center justify-between mb-3 cursor-pointer" onclick="openDetailModal('${ex.id}')">
-            <div class="flex items-center gap-3">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="openDetailModal('${ex.id}')">
               <div class="w-9 h-9 rounded-full bg-blue-600/20 text-blue-400 font-bold flex items-center justify-center text-xs">
                 ${ex.name.charAt(0)}
               </div>
@@ -216,7 +282,10 @@
                 <p class="text-[11px] text-zinc-400">${ex.muscle}</p>
               </div>
             </div>
-            <span class="text-xs text-zinc-500 font-mono">Detay ›</span>
+            <div class="flex items-center gap-2">
+              <button onclick="removeExerciseFromRoutine('${ex.id}')" class="text-zinc-600 hover:text-rose-400 text-xs px-1">✕</button>
+              <button onclick="openDetailModal('${ex.id}')" class="text-xs text-zinc-500 font-mono">Detay ›</button>
+            </div>
           </div>
 
           <div class="space-y-2 mb-3">
@@ -283,23 +352,80 @@
       renderApp();
     }
 
-    // Kas Haritası ve Sayaçları Güncelle
+    // Havuzdan Rutine Egzersiz Ekleme/Çıkarma
+    function removeExerciseFromRoutine(exId) {
+      const current = routines.find(r => r.id === currentRoutineId);
+      if (!current) return;
+      current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
+      saveRoutines();
+      renderApp();
+    }
+
+    function openExerciseSelector() {
+      const modal = document.getElementById("exercisePickerModal");
+      const list = document.getElementById("pickerList");
+      list.innerHTML = "";
+
+      const current = routines.find(r => r.id === currentRoutineId);
+
+      globalExercisePool.forEach(ex => {
+        const isAdded = current.exerciseIds.includes(ex.id);
+        const item = document.createElement("div");
+        item.className = "flex items-center justify-between p-3 rounded-xl bg-black/60 border border-zinc-800";
+        item.innerHTML = `
+          <div>
+            <p class="font-bold text-white text-xs">${ex.name}</p>
+            <p class="text-[10px] text-zinc-400">${ex.muscle}</p>
+          </div>
+          <button onclick="toggleExerciseInRoutine('${ex.id}')" class="text-xs px-3 py-1 rounded-lg font-semibold ${isAdded ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-blue-600 text-white'}">
+            ${isAdded ? 'Çıkar' : 'Ekle'}
+          </button>
+        `;
+        list.appendChild(item);
+      });
+
+      modal.classList.remove("hidden");
+    }
+
+    function toggleExerciseInRoutine(exId) {
+      const current = routines.find(r => r.id === currentRoutineId);
+      if (!current) return;
+
+      if (current.exerciseIds.includes(exId)) {
+        current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
+      } else {
+        current.exerciseIds.push(exId);
+      }
+      saveRoutines();
+      openExerciseSelector(); // Listeyi güncelle
+      renderApp();
+    }
+
+    function closeExerciseSelector() {
+      document.getElementById("exercisePickerModal").classList.add("hidden");
+    }
+
+    // Kas Analizi ve Harita
     function updateAnalytics() {
+      const current = routines.find(r => r.id === currentRoutineId);
       let totalDone = 0;
       let muscleCounts = { gogus: 0, omuz: 0, sirt: 0, kol: 0 };
 
-      exercisePool.forEach(ex => {
-        const sets = activeSets[ex.id] || [];
-        sets.forEach(s => {
-          if (s.done) {
-            totalDone++;
-            if (ex.tag === "gogus") muscleCounts.gogus++;
-            if (ex.tag === "omuz") muscleCounts.omuz++;
-            if (ex.tag === "sirt") muscleCounts.sirt++;
-            if (ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
-          }
+      if (current) {
+        current.exerciseIds.forEach(exId => {
+          const ex = globalExercisePool.find(e => e.id === exId);
+          const sets = activeSets[exId] || [];
+          sets.forEach(s => {
+            if (s.done) {
+              totalDone++;
+              if (ex.tag === "gogus") muscleCounts.gogus++;
+              if (ex.tag === "omuz") muscleCounts.omuz++;
+              if (ex.tag === "sirt") muscleCounts.sirt++;
+              if (ex.tag === "biceps" || ex.tag === "triceps") muscleCounts.kol++;
+            }
+          });
         });
-      });
+      }
 
       document.getElementById("completedCounter").innerText = `${totalDone} Set Tamam`;
       document.getElementById("cnt-gogus").innerText = `${muscleCounts.gogus} Set`;
@@ -307,14 +433,13 @@
       document.getElementById("cnt-sirt").innerText = `${muscleCounts.sirt} Set`;
       document.getElementById("cnt-kol").innerText = `${muscleCounts.kol} Set`;
 
-      // SVG Kaslarını Parlat
       const highlightColor = "#2563eb";
       const defaultColor = "#27272a";
 
       document.getElementById("muscle-gogus").setAttribute("fill", muscleCounts.gogus > 0 ? highlightColor : defaultColor);
       document.getElementById("muscle-omuz-on").setAttribute("fill", muscleCounts.omuz > 0 ? highlightColor : defaultColor);
       document.getElementById("muscle-sirt").setAttribute("fill", muscleCounts.sirt > 0 ? highlightColor : defaultColor);
-      
+
       const bicepsActive = (activeSets["btk"] || []).some(s => s.done);
       document.getElementById("muscle-biceps").setAttribute("fill", bicepsActive ? highlightColor : defaultColor);
       document.getElementById("muscle-biceps-2").setAttribute("fill", bicepsActive ? highlightColor : defaultColor);
@@ -324,8 +449,9 @@
       document.getElementById("muscle-triceps-2").setAttribute("fill", tricepsActive ? highlightColor : defaultColor);
     }
 
+    // Modal Fonksiyonları
     function openDetailModal(exId) {
-      const ex = exercisePool.find(e => e.id === exId);
+      const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
 
       document.getElementById("modalExTitle").innerText = ex.name;
@@ -397,7 +523,6 @@
       document.getElementById("detailModal").classList.add("hidden");
     }
 
-    initActiveSets();
     renderApp();
   </script>
 </body>
