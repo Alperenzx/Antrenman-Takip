@@ -51,11 +51,11 @@
 
     /* Animasyonlar */
     @keyframes pageSlideIn {
-      from { opacity: 0; transform: translateX(24px); }
+      from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
     }
     @keyframes pageSlideBack {
-      from { opacity: 0; transform: translateX(-24px); }
+      from { opacity: 0; transform: translateX(-20px); }
       to { opacity: 1; transform: translateX(0); }
     }
     @keyframes cardFadeInUp {
@@ -88,7 +88,6 @@
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
     .wiggle { animation: wiggleEffect 0.24s ease-in-out infinite; }
 
-    /* Belirgin yer değiştirme parlaması */
     .swap-highlight {
       border-color: #3b82f6 !important;
       box-shadow: 0 0 20px rgba(59, 130, 246, 0.35) !important;
@@ -110,7 +109,6 @@
       z-index: 9999 !important;
     }
 
-    /* iOS Swipe-Back Gövde Katmanı */
     .swipeable-view {
       will-change: transform;
       background-color: #000000;
@@ -136,7 +134,7 @@
   </div>
 
 
-  <!-- EKRANIN EN SAĞ ALTINA SABİTLENMİŞ BALONCUK -->
+  <!-- EKRANIN SAĞ ALTINDAKİ BALONCUK -->
   <div id="floatingExerciseBubble" class="screen-fab-fixed">
     <button onclick="openLibraryPage()" title="Egzersiz Havuzu" class="tap-press w-14 h-14 rounded-full bg-zinc-900 border border-zinc-700 hover:border-blue-500 text-blue-400 flex items-center justify-center shadow-2xl shadow-black backdrop-blur-xl active:scale-90">
       <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
@@ -212,7 +210,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI ================= -->
+  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI (SAF İSTATİSTİK) ================= -->
   <div id="viewLibraryDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeLibraryDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -256,7 +254,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI ================= -->
+  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI (YENİ SIRALAMA İLE) ================= -->
   <div id="viewWorkoutExerciseDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeWorkoutExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -269,6 +267,7 @@
       <div class="w-9"></div>
     </header>
 
+    <!-- 1. EN ÜST: NOTLAR & AYARLAR -->
     <section class="mt-4 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">HAREKET NOTLARI & AYARLAR</h3>
@@ -277,24 +276,35 @@
       <textarea id="workoutExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-800/80 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
+    <!-- 2. HEMEN ALTI: FORM & YAPILIŞ VİDEOSU (GÖMÜLÜ / EMBEDDED OYNATICI) -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2 px-1">
-        <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM & YAPILIŞ VİDEOSU</h3>
-        <span class="text-[10px] text-zinc-500">Rehber</span>
+        <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM REHBERİ VİDEOSU</h3>
+        <span class="text-[10px] text-blue-400 font-bold">Özel Kesit</span>
       </div>
-      <div id="workoutVideoContainer" class="bg-black/90 border border-zinc-850 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
-        <div class="w-10 h-10 rounded-full bg-rose-600/20 text-rose-500 flex items-center justify-center text-base mb-2">
-          ▶
-        </div>
-        <p class="text-xs font-bold text-white" id="workoutVideoLabel">Video Rehberi</p>
-        <p class="text-[10px] text-zinc-500 mt-0.5" id="workoutVideoDesc">Özel video linkleri eklenebilir.</p>
+      
+      <!-- 16:9 YouTube Gömülü Oynatıcı -->
+      <div id="workoutVideoContainer" class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-850 shadow-inner">
+        <iframe id="workoutVideoIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
     </section>
 
-    <section class="mt-3.5 mb-8">
+    <!-- 3. VİDEONUN ALTI: AĞIRLIK GELİŞİM GRAFİĞİ -->
+    <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-xs font-bold text-zinc-400 font-num tracking-wide">AĞIRLIK GELİŞİMİ</h3>
+        <span class="text-[10px] text-zinc-500 font-num">Seanslar</span>
+      </div>
+      <div class="h-44 w-full">
+        <canvas id="workoutProgressionChart"></canvas>
+      </div>
+    </section>
+
+    <!-- 4. EN ALT: ANTRENMAN GEÇMİŞİ -->
+    <section class="mt-4 mb-8">
       <div class="flex justify-between items-center mb-2 px-1">
         <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
-        <span class="text-[10px] text-zinc-500">Detaylar</span>
+        <span class="text-[10px] text-zinc-500">Tüm Kayıtlar</span>
       </div>
       <div id="workoutExHistoryList" class="space-y-2"></div>
     </section>
@@ -366,21 +376,75 @@
 
 
   <script>
+    // İSTEDİĞİN GÜNCEL STANDART HAREKETLER VE DAKİKA/SANİYE VİDEO AYARLARI
     const defaultExercisePool = [
-      { id: "bp", name: "Bench Press", muscle: "Göğüs" },
-      { id: "cf", name: "Chest Fly", muscle: "Göğüs" },
-      { id: "salr", name: "Single Arm Lateral Raise", muscle: "Omuz" },
-      { id: "sspm", name: "Seated Shoulder Press (Machine)", muscle: "Omuz" },
-      { id: "scrvg", name: "Seated Cable Row (V Grip)", muscle: "Sırt" },
-      { id: "lp", name: "Lat Pulldown", muscle: "Sırt" },
-      { id: "oteb", name: "Overhead Triceps Extension (Bar)", muscle: "Triceps" },
-      { id: "bcc", name: "Back Curl (Cable)", muscle: "Biceps" }
+      { 
+        id: "bp", 
+        name: "Bench Press", 
+        muscle: "Göğüs", 
+        videoUrl: "https://www.youtube.com/embed/hWbUlkb5Ms4?start=0" 
+      },
+      { 
+        id: "cf", 
+        name: "Chest Fly", 
+        muscle: "Göğüs", 
+        videoUrl: "https://www.youtube.com/embed/I-Ue34qLxc4?start=0" 
+      },
+      { 
+        id: "clr", 
+        name: "Cable Lateral Raise", 
+        muscle: "Omuz", 
+        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=420&end=553" 
+      },
+      { 
+        id: "sspm", 
+        name: "Seated Shoulder Press (Machine)", 
+        muscle: "Omuz", 
+        videoUrl: "https://www.youtube.com/embed/6v4nrRVySj0?start=0" 
+      },
+      { 
+        id: "pr", 
+        name: "Pendlay Row", 
+        muscle: "Sırt", 
+        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=553&end=659" 
+      },
+      { 
+        id: "scrvg", 
+        name: "Seated Cable Row (V Grip)", 
+        muscle: "Sırt", 
+        videoUrl: "https://www.youtube.com/embed/qD1WZ5pSuvk?start=0" 
+      },
+      { 
+        id: "lp", 
+        name: "Lat Pulldown", 
+        muscle: "Sırt", 
+        videoUrl: "https://www.youtube.com/embed/hnSqbBk15tw?start=0" 
+      },
+      { 
+        id: "coteb", 
+        name: "Cable Overhead Triceps Extension", 
+        muscle: "Triceps", 
+        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=659&end=710" 
+      },
+      { 
+        id: "bc", 
+        name: "Bayesian Curl", 
+        muscle: "Biceps", 
+        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=711&end=766" 
+      }
     ];
 
     let savedPool = JSON.parse(localStorage.getItem("fit_pool")) || [];
     defaultExercisePool.forEach(defEx => {
-      const exists = savedPool.some(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
-      if (!exists) savedPool.push(defEx);
+      const existingIdx = savedPool.findIndex(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
+      if (existingIdx !== -1) {
+        // Mevcut hareketin videoUrl ve ismini güncelle
+        savedPool[existingIdx].videoUrl = defEx.videoUrl;
+        savedPool[existingIdx].name = defEx.name;
+        savedPool[existingIdx].muscle = defEx.muscle;
+      } else {
+        savedPool.push(defEx);
+      }
     });
     if (savedPool.length === 0) savedPool = [...defaultExercisePool];
     localStorage.setItem("fit_pool", JSON.stringify(savedPool));
@@ -391,7 +455,8 @@
     let selectedDetailExId = null;
     let isCreatingFromLibrary = false;
     let tempSelectedExerciseIds = [];
-    let chartInstance = null;
+    let chartInstanceLib = null;
+    let chartInstanceWorkout = null;
     let isReorderingRoutine = false;
     let isReorderingLibrary = false;
     let longPressTimer = null;
@@ -446,7 +511,7 @@
       }
     }
 
-    // ================= APPLE STANDARTLARINDA SOLDAN SAĞA SWIPE-TO-BACK MOTORU =================
+    // --- APPLE STANDARTLARINDA SOLDAN SAĞA SWIPE-TO-BACK MOTORU ---
     let touchStartX = 0;
     let touchStartY = 0;
     let isSwipingBack = false;
@@ -473,7 +538,6 @@
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
       
-      // Ekranın en solundan (ilk 38px) başlayan dokunuşları yakala
       if (x <= 38) {
         const active = getActiveSubView();
         if (active) {
@@ -493,10 +557,8 @@
       const deltaX = currentX - touchStartX;
       const deltaY = Math.abs(currentY - touchStartY);
 
-      // Yatay hareket dikeyden belirginse sayfayı parmakla birlikte kaydır
       if (deltaX > 0 && deltaX > deltaY) {
         activeSwipeElement.style.transform = `translateX(${deltaX}px)`;
-        // Arka planı hafif şeffaflaştırarak derinlik ver
         activeSwipeElement.style.boxShadow = `-10px 0 25px rgba(0,0,0,0.8)`;
       }
     }, { passive: true });
@@ -510,7 +572,6 @@
 
       activeSwipeElement.style.transition = "transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.24s ease";
 
-      // 80 pikselden fazla çekildiyse kapat, yoksa geri yerine yaylandır
       if (deltaX > 80 && active) {
         activeSwipeElement.style.transform = `translateX(100%)`;
         setTimeout(() => {
@@ -530,7 +591,6 @@
       activeSwipeElement = null;
     });
 
-    // Browser Geçmişi Desteği (iOS Donanımsal Geri Desteği)
     window.addEventListener("popstate", () => {
       const active = getActiveSubView();
       if (active) active.backFn();
@@ -751,7 +811,6 @@
       });
     }
 
-    // FLIP METODUYLA BELİRGİN YER DEĞİŞTİRME ANİMASYONU
     function animateAndMoveRoutine(index, direction) {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return;
@@ -768,7 +827,6 @@
         const firstCurrentRect = currentCard.getBoundingClientRect();
         const firstTargetRect = targetCard.getBoundingClientRect();
 
-        // Diziyi güncelle
         const temp = routine.exerciseIds[index];
         routine.exerciseIds[index] = routine.exerciseIds[targetIndex];
         routine.exerciseIds[targetIndex] = temp;
@@ -786,7 +844,6 @@
           const invertCurrentY = firstCurrentRect.top - lastCurrentRect.top;
           const invertTargetY = firstTargetRect.top - lastTargetRect.top;
 
-          // Başlangıç konumuna çek
           newCurrentCard.style.transform = `translateY(${invertCurrentY}px) scale(1.02)`;
           newCurrentCard.style.transition = 'none';
           newCurrentCard.classList.add('swap-highlight');
@@ -794,10 +851,8 @@
           newTargetCard.style.transform = `translateY(${invertTargetY}px)`;
           newTargetCard.style.transition = 'none';
 
-          // Reflow zorla
           newCurrentCard.offsetHeight;
 
-          // Akıcı ve belirgin geçişle yerine oturt
           newCurrentCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.32s ease';
           newTargetCard.style.transition = 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
 
@@ -1018,7 +1073,7 @@
       }
     }
 
-    // --- KÜTÜPHANE DETAYI ---
+    // --- KÜTÜPHANE DETAYI (SAF İSTATİSTİK) ---
     function openLibraryDetail(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -1038,7 +1093,8 @@
       renderGroupedHistory(hist, histContainer, "lib_day_");
 
       const ctx = document.getElementById('libDetailChart').getContext('2d');
-      renderProgressionChart(ctx, hist);
+      if (chartInstanceLib) chartInstanceLib.destroy();
+      chartInstanceLib = createProgressionChart(ctx, hist);
 
       document.getElementById("viewLibrary").classList.add("hidden");
       const vDetail = document.getElementById("viewLibraryDetail");
@@ -1052,7 +1108,7 @@
       openLibraryPage();
     }
 
-    // --- PROGRAM İÇİ DETAY SAYFASI ---
+    // --- PROGRAM İÇİ DETAY SAYFASI (YENİ SIRALAMA & GÖMÜLÜ VİDEO) ---
     function openWorkoutExerciseDetail(exId) {
       selectedDetailExId = exId;
       const ex = globalExercisePool.find(e => e.id === exId);
@@ -1062,12 +1118,25 @@
       document.getElementById("workoutExDetailTitle").innerText = ex.name;
       document.getElementById("workoutExDetailMuscle").innerText = ex.muscle;
 
+      // 1. Not Yükle
       const note = localStorage.getItem(`fit_note_${exId}`) || "";
       document.getElementById("workoutExNoteInput").value = note;
 
-      document.getElementById("workoutVideoLabel").innerText = `${ex.name} Form Rehberi`;
+      // 2. Özel YouTube Kesiti İframe'e Yükle
+      const iframe = document.getElementById("workoutVideoIframe");
+      if (ex.videoUrl) {
+        iframe.src = ex.videoUrl;
+      } else {
+        iframe.src = "";
+      }
 
+      // 3. Gelişim Grafiğini Çiz
       const hist = getHistory(exId);
+      const ctx = document.getElementById('workoutProgressionChart').getContext('2d');
+      if (chartInstanceWorkout) chartInstanceWorkout.destroy();
+      chartInstanceWorkout = createProgressionChart(ctx, hist);
+
+      // 4. Antrenman Geçmişi Dökümü
       const histContainer = document.getElementById("workoutExHistoryList");
       histContainer.innerHTML = "";
       renderGroupedHistory(hist, histContainer, "workout_day_");
@@ -1080,6 +1149,10 @@
     }
 
     function closeWorkoutExerciseDetail() {
+      // Sayfadan çıkınca videoyu durdur
+      const iframe = document.getElementById("workoutVideoIframe");
+      iframe.src = "";
+
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
       const vWorkout = document.getElementById("viewWorkout");
       vWorkout.classList.remove("hidden");
@@ -1149,15 +1222,14 @@
       });
     }
 
-    function renderProgressionChart(ctx, hist) {
-      if (chartInstance) chartInstance.destroy();
+    function createProgressionChart(ctx, hist) {
       const labels = hist.map(h => h.date);
       const dataPoints = hist.map(h => {
         const nums = h.kg.match(/\d+(\.\d+)?/g);
         return nums ? nums.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) : 0;
       });
 
-      chartInstance = new Chart(ctx, {
+      return new Chart(ctx, {
         type: 'line',
         data: {
           labels: labels.slice(-8),
@@ -1271,7 +1343,7 @@
       const muscle = document.getElementById("newExMuscleInput").value.trim() || "Genel";
       if (!name) return;
 
-      const newEx = { id: "ex_" + Date.now(), name: name, muscle: muscle };
+      const newEx = { id: "ex_" + Date.now(), name: name, muscle: muscle, videoUrl: "" };
       globalExercisePool.push(newEx);
       savePool();
 
