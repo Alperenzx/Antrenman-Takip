@@ -34,6 +34,7 @@
     body {
       padding-top: var(--sat);
       background-color: #000000;
+      background-image: radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
       color: #f4f4f5;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
@@ -162,6 +163,9 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="finishWorkout()" class="text-[11px] bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full font-bold active:scale-90 flex items-center gap-1">
+          <span>✓</span> Bitir
+        </button>
         <button id="btnToggleReorderRoutine" onclick="toggleReorderMode('routine')" class="text-[11px] bg-zinc-900 border border-zinc-800 text-zinc-300 px-3 py-1.5 rounded-full font-bold active:scale-90">
           Düzenle
         </button>
@@ -203,6 +207,17 @@
       </div>
     </header>
 
+    <!-- Yedekleme & Geri Yükleme Araç Çubuğu -->
+    <div class="mt-3 flex gap-2">
+      <button onclick="exportData()" class="flex-1 py-2 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-[11px] font-bold text-zinc-400 flex items-center justify-center gap-1.5 tap-press">
+        <span>💾</span> Verileri Yedekle
+      </button>
+      <label class="flex-1 py-2 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-[11px] font-bold text-zinc-400 flex items-center justify-center gap-1.5 tap-press cursor-pointer">
+        <span>📥</span> Geri Yükle
+        <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+      </label>
+    </div>
+
     <p class="text-[11px] text-zinc-500 mt-3 px-1">Sıralamak için basılı tut veya 'Düzenle'ye dokun:</p>
 
     <div id="libraryListContainer" class="mt-3 space-y-2.5 mb-8"></div>
@@ -222,16 +237,34 @@
       <div class="w-9"></div>
     </header>
 
-    <div class="grid grid-cols-2 gap-2 mt-4">
-      <div class="bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl text-center shadow-md">
-        <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">BAŞLANGIÇ TARİHİ</span>
+    <!-- Başlangıç, Max Kilo ve Tahmini 1RM -->
+    <div class="grid grid-cols-3 gap-2 mt-4">
+      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
+        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">BAŞLANGIÇ</span>
         <span id="libDetailFirstDate" class="text-xs font-bold text-white font-num">-</span>
       </div>
-      <div class="bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl text-center shadow-md">
-        <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">MAKS KİLO (PR)</span>
+      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
+        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">MAKS PR</span>
         <span id="libDetailMaxKg" class="text-xs font-extrabold text-blue-400 font-num">- KG</span>
       </div>
+      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
+        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">TAHMİNİ 1RM</span>
+        <span id="libDetailEst1RM" class="text-xs font-extrabold text-emerald-400 font-num">- KG</span>
+      </div>
     </div>
+
+    <!-- Plaka Hesaplayıcı Asistanı -->
+    <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <h3 class="text-xs font-bold text-zinc-400 tracking-wide">PLAKA HESAPLAYICI (BAR: 20 KG)</h3>
+        <span id="plateCalcResult" class="text-[10px] text-zinc-400 font-num font-bold">Her Taraf: -</span>
+      </div>
+      <div class="flex gap-2">
+        <input id="inputTargetPlateKg" type="text" inputmode="decimal" placeholder="Hedef KG (Örn: 85)" class="flex-1 bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs font-num font-bold text-white focus:outline-none focus:border-blue-500">
+        <button onclick="calculatePlates()" class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold text-white tap-press">Hesapla</button>
+      </div>
+      <div id="plateVisualDisplay" class="mt-2.5 flex items-center gap-1.5 flex-wrap"></div>
+    </section>
 
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
@@ -313,7 +346,56 @@
   </div>
 
 
-  <!-- ================= POPUPLAR ================= -->
+  <!-- ================= POPUP: ANTRENMAN BİTİR ÖZETİ ================= -->
+  <div id="summaryModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade">
+    <div class="bg-zinc-950 border border-zinc-800 w-full max-w-sm rounded-[32px] p-6 shadow-2xl text-center anim-pop">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-3">
+        🎉
+      </div>
+      <h3 class="text-xl font-black text-white mb-1">Antrenman Tamamlandı!</h3>
+      <p class="text-xs text-zinc-400 mb-5">Tüm setler başarıyla günlüğüne kaydedildi.</p>
+
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl">
+          <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider">TOPLAM SET</span>
+          <span id="sumTotalSets" class="text-lg font-black text-white font-num">0</span>
+        </div>
+        <div class="bg-zinc-900/80 border border-zinc-800 p-3 rounded-2xl">
+          <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider">TOPLAM HACİM</span>
+          <span id="sumTotalVolume" class="text-lg font-black text-blue-400 font-num">0 KG</span>
+        </div>
+      </div>
+
+      <div id="sumPRBox" class="bg-blue-950/20 border border-blue-500/30 p-3 rounded-2xl mb-5 text-left hidden">
+        <span class="text-[10px] font-bold text-blue-400 block mb-1">🏆 YENİ REKORLAR (PR)</span>
+        <div id="sumPRList" class="text-xs font-semibold text-white space-y-1"></div>
+      </div>
+
+      <button onclick="closeSummaryModal()" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl shadow-lg shadow-blue-600/30 tap-press">
+        Harika, Ana Sayfaya Dön
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ================= DİNLENME SÜRESİ SAYACI (REST TIMER) ================= -->
+  <div id="restTimerBar" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto bg-zinc-900/95 border border-zinc-700/80 rounded-2xl p-3 shadow-2xl backdrop-blur-xl flex items-center justify-between hidden z-50">
+    <div class="flex items-center gap-2.5">
+      <span class="text-base animate-pulse">⏱️</span>
+      <div>
+        <span class="text-[9px] text-zinc-400 font-bold block uppercase tracking-wider">DİNLENME SÜRESİ</span>
+        <span id="restTimerDisplay" class="text-base font-black text-white font-num">01:30</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button onclick="adjustRestTimer(-15)" class="px-2 py-1 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-300 active:scale-90">-15s</button>
+      <button onclick="adjustRestTimer(30)" class="px-2 py-1 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-300 active:scale-90">+30s</button>
+      <button onclick="closeRestTimer()" class="w-7 h-7 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-400 active:scale-90 ml-1">✕</button>
+    </div>
+  </div>
+
+
+  <!-- ================= POPUP: YENİ PROGRAM ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
     <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
       <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
@@ -350,9 +432,15 @@
     </div>
   </div>
 
+
+  <!-- ================= ALTTAN AÇILAN EGZERSİZ SEÇİM PANELİ (AŞAĞI ÇEKEREK KAPATMA DESTEKLİ) ================= -->
   <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
-    <div class="bg-zinc-950 border-t border-zinc-800/80 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
-      <div class="w-12 h-1.5 bg-zinc-800 rounded-full mx-auto mb-3.5"></div>
+    <div id="exercisePickerSheet" class="bg-zinc-950 border-t border-zinc-800/80 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
+      
+      <!-- Çekerek Kapatma Tutamacı -->
+      <div id="sheetDragHandle" class="py-2 cursor-grab active:cursor-grabbing">
+        <div class="w-12 h-1.5 bg-zinc-700 hover:bg-zinc-500 rounded-full mx-auto transition"></div>
+      </div>
       
       <div class="flex justify-between items-center mb-2 px-1">
         <div>
@@ -378,132 +466,27 @@
 
 
   <script>
-    // İSTEDİĞİN GÜNCEL STANDART HAREKETLER VE VİDEOLAR
     const cleanStandardPool = [
-      { 
-        id: "bp", 
-        name: "Bench Press", 
-        muscle: "Göğüs", 
-        videoId: "hWbUlkb5Ms4",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "dips_gogus", 
-        name: "Dips (Göğüs)", 
-        muscle: "Göğüs", 
-        videoId: "eicOUO9WaJc",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "mp", 
-        name: "Military Press", 
-        muscle: "Omuz", 
-        videoId: "",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "lr", 
-        name: "Lateral Raise", 
-        muscle: "Omuz", 
-        videoId: "Kl3LEzQ5Zqs",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "lp", 
-        name: "Lat Pulldown", 
-        muscle: "Sırt", 
-        videoId: "hnSqbBk15tw",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "pr", 
-        name: "Pendlay Row", 
-        muscle: "Sırt", 
-        videoId: "axoeDmW0oAY",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "barbell_curl", 
-        name: "Barbell Curl", 
-        muscle: "Biceps", 
-        videoId: "54x2WF1_Suc",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "skull_crusher", 
-        name: "Skull Crusher", 
-        muscle: "Triceps", 
-        videoId: "K3mFeNz4e3w",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "cf", 
-        name: "Chest Fly", 
-        muscle: "Göğüs", 
-        videoId: "I-Ue34qLxc4",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "clr", 
-        name: "Cable Lateral Raise", 
-        muscle: "Omuz", 
-        videoId: "928aRhhPP8I",
-        start: 420,
-        end: 553
-      },
-      { 
-        id: "sspm", 
-        name: "Seated Shoulder Press (Machine)", 
-        muscle: "Omuz", 
-        videoId: "6v4nrRVySj0",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "scrvg", 
-        name: "Seated Cable Row (V Grip)", 
-        muscle: "Sırt", 
-        videoId: "qD1WZ5pSuvk",
-        start: 0,
-        end: 0
-      },
-      { 
-        id: "coteb", 
-        name: "Cable Overhead Triceps Extension", 
-        muscle: "Triceps", 
-        videoId: "928aRhhPP8I",
-        start: 659,
-        end: 710
-      },
-      { 
-        id: "bc", 
-        name: "Bayesian Curl", 
-        muscle: "Biceps", 
-        videoId: "928aRhhPP8I",
-        start: 711,
-        end: 766
-      }
+      { id: "bp", name: "Bench Press", muscle: "Göğüs", videoId: "hWbUlkb5Ms4", start: 0, end: 0 },
+      { id: "dips_gogus", name: "Dips (Göğüs)", muscle: "Göğüs", videoId: "eicOUO9WaJc", start: 0, end: 0 },
+      { id: "mp", name: "Military Press", muscle: "Omuz", videoId: "", start: 0, end: 0 },
+      { id: "lr", name: "Lateral Raise", muscle: "Omuz", videoId: "Kl3LEzQ5Zqs", start: 0, end: 0 },
+      { id: "lp", name: "Lat Pulldown", muscle: "Sırt", videoId: "hnSqbBk15tw", start: 0, end: 0 },
+      { id: "pr", name: "Pendlay Row", muscle: "Sırt", videoId: "axoeDmW0oAY", start: 0, end: 0 },
+      { id: "barbell_curl", name: "Barbell Curl", muscle: "Biceps", videoId: "54x2WF1_Suc", start: 0, end: 0 },
+      { id: "skull_crusher", name: "Skull Crusher", muscle: "Triceps", videoId: "K3mFeNz4e3w", start: 0, end: 0 },
+      { id: "cf", name: "Chest Fly", muscle: "Göğüs", videoId: "I-Ue34qLxc4", start: 0, end: 0 },
+      { id: "clr", name: "Cable Lateral Raise", muscle: "Omuz", videoId: "928aRhhPP8I", start: 420, end: 553 },
+      { id: "sspm", name: "Seated Shoulder Press (Machine)", muscle: "Omuz", videoId: "6v4nrRVySj0", start: 0, end: 0 },
+      { id: "scrvg", name: "Seated Cable Row (V Grip)", muscle: "Sırt", videoId: "qD1WZ5pSuvk", start: 0, end: 0 },
+      { id: "coteb", name: "Cable Overhead Triceps Extension", muscle: "Triceps", videoId: "928aRhhPP8I", start: 659, end: 710 },
+      { id: "bc", name: "Bayesian Curl", muscle: "Biceps", videoId: "928aRhhPP8I", start: 711, end: 766 }
     ];
 
-    // Eski mükerrer/hatalı isimleri temizleme listesi
     const unwantedNames = [
-      "back curl (cable)",
-      "back curl",
-      "overhead triceps extension (bar)",
-      "overhead triceps extension",
-      "single arm lateral raise",
-      "triceps bar baş üstü",
-      "biceps tek kol",
-      "seated cable row"
+      "back curl (cable)", "back curl", "overhead triceps extension (bar)",
+      "overhead triceps extension", "single arm lateral raise", "triceps bar baş üstü",
+      "biceps tek kol", "seated cable row"
     ];
 
     let savedPool = JSON.parse(localStorage.getItem("fit_pool")) || [];
@@ -540,6 +523,18 @@
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
+    // Dinlenme Sayacı Değişkenleri
+    let restTimerInterval = null;
+    let restSecondsLeft = 90;
+
+    function triggerHaptic(type = "light") {
+      if (navigator.vibrate) {
+        if (type === "light") navigator.vibrate(15);
+        else if (type === "medium") navigator.vibrate(30);
+        else if (type === "heavy") navigator.vibrate([40, 30, 40]);
+      }
+    }
+
     function savePool() { localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool)); }
     function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
     function getHistory(exId) { return JSON.parse(localStorage.getItem(`fit_history_${exId}`) || "[]"); }
@@ -549,12 +544,16 @@
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
 
+    // --- UZUN BASMA ---
     function attachLongPress(element, callback) {
       let moved = false;
       const start = () => {
         moved = false;
         longPressTimer = setTimeout(() => {
-          if (!moved) callback();
+          if (!moved) {
+            triggerHaptic("medium");
+            callback();
+          }
         }, 450);
       };
       const cancel = () => {
@@ -572,6 +571,7 @@
     }
 
     function toggleReorderMode(scope) {
+      triggerHaptic("light");
       if (scope === 'routine') {
         isReorderingRoutine = !isReorderingRoutine;
         const btn = document.getElementById("btnToggleReorderRoutine");
@@ -650,6 +650,7 @@
 
       if (deltaX > 80 && active) {
         activeSwipeElement.style.transform = `translateX(100%)`;
+        triggerHaptic("light");
         setTimeout(() => {
           activeSwipeElement.style.transform = "";
           activeSwipeElement.style.boxShadow = "";
@@ -675,6 +676,45 @@
     function pushHistoryState(pageName) {
       history.pushState({ page: pageName }, "");
     }
+
+    // ================= AŞAĞI ÇEKEREK EGZERSİZ PANELİNİ KAPATMA (SWIPE DOWN DISMISS) =================
+    let sheetStartY = 0;
+    let isDraggingSheet = false;
+    const sheetEl = document.getElementById("exercisePickerSheet");
+    const dragHandle = document.getElementById("sheetDragHandle");
+
+    dragHandle.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      sheetStartY = e.touches[0].clientY;
+      isDraggingSheet = true;
+      sheetEl.style.transition = "none";
+    }, { passive: true });
+
+    dragHandle.addEventListener("touchmove", (e) => {
+      if (!isDraggingSheet) return;
+      const deltaY = e.touches[0].clientY - sheetStartY;
+      if (deltaY > 0) {
+        sheetEl.style.transform = `translateY(${deltaY}px)`;
+      }
+    }, { passive: true });
+
+    dragHandle.addEventListener("touchend", (e) => {
+      if (!isDraggingSheet) return;
+      isDraggingSheet = false;
+      const deltaY = e.changedTouches[0].clientY - sheetStartY;
+      sheetEl.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
+
+      if (deltaY > 110) {
+        sheetEl.style.transform = "translateY(100%)";
+        triggerHaptic("light");
+        setTimeout(() => {
+          sheetEl.style.transform = "";
+          closeExerciseSelector();
+        }, 220);
+      } else {
+        sheetEl.style.transform = "translateY(0)";
+      }
+    });
 
     // --- SAYFA GEÇİŞLERİ ---
     function goHome() {
@@ -829,6 +869,13 @@
         let setsHtml = "";
         sets.forEach((set, idx) => {
           const isDone = set.done;
+          
+          // Renkli Tür Rozet Sınıfı
+          let typeColorClass = "text-zinc-300";
+          if (set.type === "F") typeColorClass = "text-rose-400 font-extrabold";
+          else if (set.type === "W") typeColorClass = "text-amber-400 font-extrabold";
+          else if (set.type === "D") typeColorClass = "text-purple-400 font-extrabold";
+
           setsHtml += `
             <div class="grid grid-cols-[22px_1fr_1fr_52px_36px] gap-2 items-center bg-black/60 p-2 rounded-xl border ${isDone ? 'border-blue-500/40 bg-blue-950/20' : 'border-zinc-850'} transition">
               <span class="text-[11px] font-bold ${isDone ? 'text-blue-400' : 'text-zinc-500'} text-center font-num">${idx + 1}</span>
@@ -837,9 +884,11 @@
               
               <input type="text" inputmode="numeric" pattern="[0-9]*" placeholder="${lastRec ? lastRec.reps : 'Rep'}" value="${set.reps}" onchange="updateSetVal('${ex.id}', ${idx}, 'reps', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-xs text-white focus:outline-none focus:border-blue-500/60 font-num font-bold">
               
-              <select onchange="updateSetVal('${ex.id}', ${idx}, 'type', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-[10px] font-extrabold ${set.type === 'F' ? 'text-rose-400' : 'text-zinc-300'} focus:outline-none font-num">
+              <select onchange="updateSetVal('${ex.id}', ${idx}, 'type', this.value)" class="w-full bg-zinc-950 border border-zinc-800/80 rounded-lg p-2 text-center text-[10px] font-bold ${typeColorClass} focus:outline-none font-num">
                 <option value="Norm" ${set.type === 'Norm' ? 'selected' : ''}>OK</option>
-                <option value="F" ${set.type === 'F' ? 'selected' : ''}>F</option>
+                <option value="F" ${set.type === 'F' ? 'selected' : ''}>F (Fail)</option>
+                <option value="W" ${set.type === 'W' ? 'selected' : ''}>W (Warm)</option>
+                <option value="D" ${set.type === 'D' ? 'selected' : ''}>D (Drop)</option>
                 <option value="R1" ${set.type === 'R1' ? 'selected' : ''}>R1</option>
                 <option value="R2" ${set.type === 'R2' ? 'selected' : ''}>R2</option>
               </select>
@@ -855,7 +904,9 @@
               <h3 class="text-blue-400 font-extrabold text-sm hover:underline leading-tight tracking-tight flex items-center gap-1.5">
                 ${ex.name} <span class="text-zinc-600 text-[10px]">›</span>
               </h3>
-              <p class="text-[10px] text-zinc-500 font-medium mt-0.5">${ex.muscle}</p>
+              <p class="text-[10px] text-zinc-500 font-medium mt-0.5">
+                ${ex.muscle} ${lastRec ? `• <span class="text-zinc-400 font-num">Son: ${lastRec.kg}kg × ${lastRec.reps}</span>` : ''}
+              </p>
             </div>
 
             ${isReorderingRoutine ? `
@@ -954,6 +1005,7 @@
     }
 
     function addSet(exId) {
+      triggerHaptic("light");
       if (!routineSets[currentRoutineId][exId]) {
         routineSets[currentRoutineId][exId] = [];
       }
@@ -974,6 +1026,7 @@
     }
 
     function removeSet(exId) {
+      triggerHaptic("light");
       if (routineSets[currentRoutineId] && routineSets[currentRoutineId][exId] && routineSets[currentRoutineId][exId].length > 0) {
         routineSets[currentRoutineId][exId].pop();
         saveRoutineSets();
@@ -988,20 +1041,119 @@
       saveRoutineSets();
 
       if (set.done) {
+        triggerHaptic("medium");
         const hist = getHistory(exId);
         const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
         hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type, setNumber: idx + 1, timestamp: Date.now() });
         saveHistory(exId, hist);
+
+        // Dinlenme Sayacını Başlat
+        startRestTimer(90);
       }
       renderWorkout(false);
     }
 
     function removeExerciseFromRoutine(exId) {
+      triggerHaptic("medium");
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
       current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
       saveRoutines();
       renderWorkout(false);
+    }
+
+    // --- DİNLENME SÜRESİ SAYACI (REST TIMER) ---
+    function startRestTimer(seconds = 90) {
+      restSecondsLeft = seconds;
+      document.getElementById("restTimerBar").classList.remove("hidden");
+      updateRestTimerDisplay();
+
+      if (restTimerInterval) clearInterval(restTimerInterval);
+      restTimerInterval = setInterval(() => {
+        restSecondsLeft--;
+        if (restSecondsLeft <= 0) {
+          clearInterval(restTimerInterval);
+          triggerHaptic("heavy");
+          closeRestTimer();
+        } else {
+          updateRestTimerDisplay();
+        }
+      }, 1000);
+    }
+
+    function updateRestTimerDisplay() {
+      const m = Math.floor(restSecondsLeft / 60);
+      const s = restSecondsLeft % 60;
+      document.getElementById("restTimerDisplay").innerText = 
+        `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function adjustRestTimer(delta) {
+      restSecondsLeft = Math.max(5, restSecondsLeft + delta);
+      updateRestTimerDisplay();
+      triggerHaptic("light");
+    }
+
+    function closeRestTimer() {
+      if (restTimerInterval) clearInterval(restTimerInterval);
+      document.getElementById("restTimerBar").classList.add("hidden");
+    }
+
+    // --- ANTRENMAN BİTİR VE ÖZET POPUP'I ---
+    function finishWorkout() {
+      const routine = routines.find(r => r.id === currentRoutineId);
+      if (!routine) return;
+
+      let totalSets = 0;
+      let totalVolume = 0;
+      const prList = [];
+
+      routine.exerciseIds.forEach(exId => {
+        const sets = (routineSets[currentRoutineId] && routineSets[currentRoutineId][exId]) || [];
+        const ex = globalExercisePool.find(e => e.id === exId);
+        let maxSessionKg = 0;
+
+        sets.forEach(s => {
+          if (s.done) {
+            totalSets++;
+            const kgVal = parseFloat(s.kg) || 0;
+            const repVal = parseFloat(s.reps) || 0;
+            totalVolume += (kgVal * repVal);
+            if (kgVal > maxSessionKg) maxSessionKg = kgVal;
+          }
+        });
+
+        // PR Kontrolü
+        const hist = getHistory(exId);
+        const prevHist = hist.slice(0, -sets.filter(s => s.done).length);
+        const prevMax = getMaxKg(prevHist) || 0;
+        if (maxSessionKg > prevMax && prevMax > 0 && ex) {
+          prList.push(`${ex.name}: ${maxSessionKg} KG (Önceki: ${prevMax} KG)`);
+        }
+      });
+
+      document.getElementById("sumTotalSets").innerText = totalSets;
+      document.getElementById("sumTotalVolume").innerText = `${Math.round(totalVolume)} KG`;
+
+      const prBox = document.getElementById("sumPRBox");
+      const prListEl = document.getElementById("sumPRList");
+      if (prList.length > 0) {
+        prListEl.innerHTML = prList.map(p => `<div>• ${p}</div>`).join("");
+        prBox.classList.remove("hidden");
+      } else {
+        prBox.classList.add("hidden");
+      }
+
+      document.getElementById("summaryModal").classList.remove("hidden");
+      triggerHaptic("heavy");
+      lockScroll();
+    }
+
+    function closeSummaryModal() {
+      document.getElementById("summaryModal").classList.add("hidden");
+      unlockScroll();
+      closeRestTimer();
+      goHome();
     }
 
     // --- TÜM EGZERSİZ HAVUZU / KÜTÜPHANE SAYFASI ---
@@ -1037,6 +1189,21 @@
         }
       });
       return max > 0 ? max : null;
+    }
+
+    // Brzycki Formülü ile 1RM Hesaplama
+    function calculate1RM(hist) {
+      if (!hist || hist.length === 0) return null;
+      let best1RM = 0;
+      hist.forEach(h => {
+        const kg = parseFloat(h.kg) || 0;
+        const reps = parseFloat(h.reps) || 0;
+        if (kg > 0 && reps > 0) {
+          const est = kg * (36 / (37 - reps));
+          if (est > best1RM) best1RM = est;
+        }
+      });
+      return best1RM > 0 ? Math.round(best1RM) : null;
     }
 
     function renderLibrary() {
@@ -1163,8 +1330,14 @@
       histContainer.innerHTML = "";
 
       const maxKg = getMaxKg(hist);
+      const est1RM = calculate1RM(hist);
       document.getElementById("libDetailMaxKg").innerText = maxKg ? `${maxKg} KG` : "Kayıt Yok";
       document.getElementById("libDetailFirstDate").innerText = (hist.length > 0) ? hist[0].date : "Kayıt Yok";
+      document.getElementById("libDetailEst1RM").innerText = est1RM ? `${est1RM} KG` : "-";
+
+      // Plaka hesaplayıcıyı son kiloyla hazırla
+      document.getElementById("inputTargetPlateKg").value = maxKg || 60;
+      calculatePlates();
 
       renderGroupedHistory(hist, histContainer, "lib_day_");
 
@@ -1182,6 +1355,43 @@
     function closeLibraryDetail() {
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       openLibraryPage();
+    }
+
+    // --- PLAKA HESAPLAYICI MOTORU (BAR = 20KG) ---
+    function calculatePlates() {
+      const target = parseFloat(document.getElementById("inputTargetPlateKg").value) || 0;
+      const resLabel = document.getElementById("plateCalcResult");
+      const visual = document.getElementById("plateVisualDisplay");
+      visual.innerHTML = "";
+
+      if (target < 20) {
+        resLabel.innerText = "Minimum 20 KG (Bar)";
+        return;
+      }
+
+      let perSide = (target - 20) / 2;
+      resLabel.innerText = `Her Taraf: ${perSide} KG`;
+
+      const availablePlates = [20, 15, 10, 5, 2.5, 1.25];
+      const usedPlates = [];
+
+      availablePlates.forEach(p => {
+        while (perSide >= p) {
+          usedPlates.push(p);
+          perSide -= p;
+        }
+      });
+
+      if (usedPlates.length === 0) {
+        visual.innerHTML = `<span class="text-xs text-zinc-500 font-bold">Sadece Boş Bar (20 KG)</span>`;
+      } else {
+        usedPlates.forEach(p => {
+          const badge = document.createElement("span");
+          badge.className = "px-2 py-1 bg-zinc-900 border border-zinc-700 text-blue-400 font-num font-black text-xs rounded-lg shadow-sm";
+          badge.innerText = `${p}kg`;
+          visual.appendChild(badge);
+        });
+      }
     }
 
     // --- PROGRAM İÇİ DETAY SAYFASI ---
@@ -1259,6 +1469,7 @@
       if (!selectedDetailExId) return;
       const note = document.getElementById("workoutExNoteInput").value;
       localStorage.setItem(`fit_note_${selectedDetailExId}`, note);
+      triggerHaptic("light");
       alert("Not kaydedildi!");
     }
 
@@ -1351,6 +1562,7 @@
     }
 
     function toggleDayDetails(elId) {
+      triggerHaptic("light");
       const detailsEl = document.getElementById(elId);
       const arrowEl = document.getElementById(`arrow_${elId}`);
       if (detailsEl.classList.contains("hidden")) {
@@ -1362,7 +1574,7 @@
       }
     }
 
-    // --- HAVUZDAN ÇOKLU SEÇİM (SEÇİLENLER EN ÜSTTE SIRALANIR) ---
+    // --- HAVUZDAN ÇOKLU SEÇİM ---
     function openExerciseSelector() {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
@@ -1382,7 +1594,6 @@
       const list = document.getElementById("pickerList");
       list.innerHTML = "";
 
-      // Seçilenleri en üstte toplayan akıllı sıralama
       const sortedPool = [...globalExercisePool].sort((a, b) => {
         const aSelected = tempSelectedExerciseIds.includes(a.id);
         const bSelected = tempSelectedExerciseIds.includes(b.id);
@@ -1412,6 +1623,7 @@
     }
 
     function toggleTempSelection(exId) {
+      triggerHaptic("light");
       if (tempSelectedExerciseIds.includes(exId)) {
         tempSelectedExerciseIds = tempSelectedExerciseIds.filter(id => id !== exId);
       } else {
@@ -1458,6 +1670,58 @@
         tempSelectedExerciseIds.push(newEx.id);
         renderPickerList();
       }
+    }
+
+    // --- DIŞA / İÇE AKTAR (YEDEKLEME SİSTEMİ) ---
+    function exportData() {
+      triggerHaptic("medium");
+      const fullBackup = {
+        pool: globalExercisePool,
+        routines: routines,
+        sets: routineSets,
+        history: {}
+      };
+
+      globalExercisePool.forEach(ex => {
+        fullBackup.history[ex.id] = getHistory(ex.id);
+      });
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `antrenman_yedek_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.pool && data.routines) {
+            localStorage.setItem("fit_pool", JSON.stringify(data.pool));
+            localStorage.setItem("fit_routines", JSON.stringify(data.routines));
+            if (data.sets) localStorage.setItem("fit_routine_sets", JSON.stringify(data.sets));
+            if (data.history) {
+              Object.keys(data.history).forEach(exId => {
+                saveHistory(exId, data.history[exId]);
+              });
+            }
+            alert("Yedek başarıyla yüklendi! Sayfa yenileniyor...");
+            window.location.reload();
+          } else {
+            alert("Geçersiz yedek dosyası!");
+          }
+        } catch (err) {
+          alert("Dosya okunurken hata oluştu!");
+        }
+      };
+      reader.readAsText(file);
     }
 
     goHome();
