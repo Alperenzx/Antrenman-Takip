@@ -12,7 +12,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,7 +34,6 @@
     body {
       padding-top: var(--sat);
       background-color: #000000;
-      background-image: radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
       color: #f4f4f5;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
@@ -50,6 +49,7 @@
       touch-action: none;
     }
 
+    /* Akıcı Animasyonlar */
     @keyframes pageSlideIn {
       from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
@@ -114,9 +114,36 @@
       background-color: #000000;
       min-height: 100vh;
     }
+
+    /* Üst Sayaç Çubuğu Konumu */
+    .top-timer-fixed {
+      position: fixed;
+      top: calc(var(--sat) + 8px);
+      left: 16px;
+      right: 16px;
+      z-index: 60;
+    }
   </style>
 </head>
 <body class="min-h-screen pb-32 antialiased">
+
+  <!-- ================= EN ÜSTTE BÜYÜK DİNLENME SAYACI (İLERİYE SAYAN) ================= -->
+  <div id="restTimerBar" class="top-timer-fixed max-w-md mx-auto bg-zinc-950/95 border border-blue-500/40 rounded-2xl p-3.5 shadow-2xl backdrop-blur-2xl flex items-center justify-between hidden transition-all duration-300">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-lg">
+        ⏱️
+      </div>
+      <div>
+        <span class="text-[9px] text-zinc-400 font-bold block uppercase tracking-wider">DİNLENME SÜRESİ</span>
+        <span id="restTimerDisplay" class="text-2xl font-black text-white font-num tracking-tight">00:00</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="resetRestTimer()" title="Sıfırla" class="w-9 h-9 bg-zinc-900 border border-zinc-800 rounded-xl text-sm font-bold text-zinc-300 active:scale-90 flex items-center justify-center">⟲</button>
+      <button onclick="closeRestTimer()" title="Kapat" class="w-9 h-9 bg-zinc-900 border border-zinc-800 rounded-xl text-sm font-bold text-zinc-400 active:scale-90 flex items-center justify-center">✕</button>
+    </div>
+  </div>
+
 
   <!-- ================= SAYFA 1: ANA SAYFA ================= -->
   <div id="viewHome" class="swipeable-view px-4 max-w-md mx-auto">
@@ -207,7 +234,6 @@
       </div>
     </header>
 
-    <!-- Yedekleme & Geri Yükleme Araç Çubuğu -->
     <div class="mt-3 flex gap-2">
       <button onclick="exportData()" class="flex-1 py-2 px-3 bg-zinc-950 border border-zinc-800 rounded-xl text-[11px] font-bold text-zinc-400 flex items-center justify-center gap-1.5 tap-press">
         <span>💾</span> Verileri Yedekle
@@ -237,34 +263,17 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- Başlangıç, Max Kilo ve Tahmini 1RM -->
-    <div class="grid grid-cols-3 gap-2 mt-4">
-      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
-        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">BAŞLANGIÇ</span>
+    <!-- Başlangıç ve Max Kilo Bilgisi -->
+    <div class="grid grid-cols-2 gap-2 mt-4">
+      <div class="bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl text-center shadow-md">
+        <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">BAŞLANGIÇ TARİHİ</span>
         <span id="libDetailFirstDate" class="text-xs font-bold text-white font-num">-</span>
       </div>
-      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
-        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">MAKS PR</span>
+      <div class="bg-zinc-950 border border-zinc-800/80 p-3.5 rounded-2xl text-center shadow-md">
+        <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">MAKS KİLO (PR)</span>
         <span id="libDetailMaxKg" class="text-xs font-extrabold text-blue-400 font-num">- KG</span>
       </div>
-      <div class="bg-zinc-950 border border-zinc-800/80 p-3 rounded-2xl text-center shadow-md">
-        <span class="text-[8px] text-zinc-500 font-bold block uppercase tracking-wider mb-0.5">TAHMİNİ 1RM</span>
-        <span id="libDetailEst1RM" class="text-xs font-extrabold text-emerald-400 font-num">- KG</span>
-      </div>
     </div>
-
-    <!-- Plaka Hesaplayıcı Asistanı -->
-    <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
-      <div class="flex justify-between items-center mb-2 px-1">
-        <h3 class="text-xs font-bold text-zinc-400 tracking-wide">PLAKA HESAPLAYICI (BAR: 20 KG)</h3>
-        <span id="plateCalcResult" class="text-[10px] text-zinc-400 font-num font-bold">Her Taraf: -</span>
-      </div>
-      <div class="flex gap-2">
-        <input id="inputTargetPlateKg" type="text" inputmode="decimal" placeholder="Hedef KG (Örn: 85)" class="flex-1 bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs font-num font-bold text-white focus:outline-none focus:border-blue-500">
-        <button onclick="calculatePlates()" class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold text-white tap-press">Hesapla</button>
-      </div>
-      <div id="plateVisualDisplay" class="mt-2.5 flex items-center gap-1.5 flex-wrap"></div>
-    </section>
 
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
@@ -378,23 +387,6 @@
   </div>
 
 
-  <!-- ================= DİNLENME SÜRESİ SAYACI (REST TIMER) ================= -->
-  <div id="restTimerBar" class="fixed bottom-6 left-4 right-4 max-w-md mx-auto bg-zinc-900/95 border border-zinc-700/80 rounded-2xl p-3 shadow-2xl backdrop-blur-xl flex items-center justify-between hidden z-50">
-    <div class="flex items-center gap-2.5">
-      <span class="text-base animate-pulse">⏱️</span>
-      <div>
-        <span class="text-[9px] text-zinc-400 font-bold block uppercase tracking-wider">DİNLENME SÜRESİ</span>
-        <span id="restTimerDisplay" class="text-base font-black text-white font-num">01:30</span>
-      </div>
-    </div>
-    <div class="flex items-center gap-1.5">
-      <button onclick="adjustRestTimer(-15)" class="px-2 py-1 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-300 active:scale-90">-15s</button>
-      <button onclick="adjustRestTimer(30)" class="px-2 py-1 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-300 active:scale-90">+30s</button>
-      <button onclick="closeRestTimer()" class="w-7 h-7 bg-zinc-800 rounded-lg text-xs font-bold text-zinc-400 active:scale-90 ml-1">✕</button>
-    </div>
-  </div>
-
-
   <!-- ================= POPUP: YENİ PROGRAM ================= -->
   <div id="newRoutineModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 anim-fade" onclick="closeNewRoutineModal(event)">
     <div class="bg-zinc-950 border border-zinc-800/80 w-full max-w-sm rounded-[28px] p-6 shadow-2xl anim-pop" onclick="event.stopPropagation()">
@@ -433,12 +425,12 @@
   </div>
 
 
-  <!-- ================= ALTTAN AÇILAN EGZERSİZ SEÇİM PANELİ (AŞAĞI ÇEKEREK KAPATMA DESTEKLİ) ================= -->
+  <!-- ================= ALTTAN AÇILAN EGZERSİZ SEÇİM PANELİ ================= -->
   <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
     <div id="exercisePickerSheet" class="bg-zinc-950 border-t border-zinc-800/80 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
       
       <!-- Çekerek Kapatma Tutamacı -->
-      <div id="sheetDragHandle" class="py-2 cursor-grab active:cursor-grabbing">
+      <div id="sheetDragHandle" class="py-2.5 cursor-grab active:cursor-grabbing w-full">
         <div class="w-12 h-1.5 bg-zinc-700 hover:bg-zinc-500 rounded-full mx-auto transition"></div>
       </div>
       
@@ -523,17 +515,9 @@
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
-    // Dinlenme Sayacı Değişkenleri
+    // İleriye Sayan Kronometre Değişkenleri
     let restTimerInterval = null;
-    let restSecondsLeft = 90;
-
-    function triggerHaptic(type = "light") {
-      if (navigator.vibrate) {
-        if (type === "light") navigator.vibrate(15);
-        else if (type === "medium") navigator.vibrate(30);
-        else if (type === "heavy") navigator.vibrate([40, 30, 40]);
-      }
-    }
+    let restSecondsElapsed = 0;
 
     function savePool() { localStorage.setItem("fit_pool", JSON.stringify(globalExercisePool)); }
     function saveRoutines() { localStorage.setItem("fit_routines", JSON.stringify(routines)); }
@@ -544,16 +528,12 @@
     function lockScroll() { document.body.classList.add("modal-open"); }
     function unlockScroll() { document.body.classList.remove("modal-open"); }
 
-    // --- UZUN BASMA ---
     function attachLongPress(element, callback) {
       let moved = false;
       const start = () => {
         moved = false;
         longPressTimer = setTimeout(() => {
-          if (!moved) {
-            triggerHaptic("medium");
-            callback();
-          }
+          if (!moved) callback();
         }, 450);
       };
       const cancel = () => {
@@ -571,7 +551,6 @@
     }
 
     function toggleReorderMode(scope) {
-      triggerHaptic("light");
       if (scope === 'routine') {
         isReorderingRoutine = !isReorderingRoutine;
         const btn = document.getElementById("btnToggleReorderRoutine");
@@ -587,7 +566,7 @@
       }
     }
 
-    // --- APPLE SWIPE-TO-BACK MOTORU ---
+    // --- APPLE SWIPE-TO-BACK ---
     let touchStartX = 0;
     let touchStartY = 0;
     let isSwipingBack = false;
@@ -650,7 +629,6 @@
 
       if (deltaX > 80 && active) {
         activeSwipeElement.style.transform = `translateX(100%)`;
-        triggerHaptic("light");
         setTimeout(() => {
           activeSwipeElement.style.transform = "";
           activeSwipeElement.style.boxShadow = "";
@@ -677,7 +655,7 @@
       history.pushState({ page: pageName }, "");
     }
 
-    // ================= AŞAĞI ÇEKEREK EGZERSİZ PANELİNİ KAPATMA (SWIPE DOWN DISMISS) =================
+    // ================= AŞAĞI ÇEKEREK EGZERSİZ PANELİNİ KAPATMA (AKICI ANİMASYONLU) =================
     let sheetStartY = 0;
     let isDraggingSheet = false;
     const sheetEl = document.getElementById("exercisePickerSheet");
@@ -702,17 +680,23 @@
       if (!isDraggingSheet) return;
       isDraggingSheet = false;
       const deltaY = e.changedTouches[0].clientY - sheetStartY;
-      sheetEl.style.transition = "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
 
-      if (deltaY > 110) {
+      // 90 pikselden fazla çekildiyse akıcıca aşağı kaydırıp kapat
+      if (deltaY > 90) {
+        sheetEl.style.transition = "transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.26s ease";
         sheetEl.style.transform = "translateY(100%)";
-        triggerHaptic("light");
         setTimeout(() => {
           sheetEl.style.transform = "";
+          sheetEl.style.transition = "";
           closeExerciseSelector();
-        }, 220);
+        }, 250);
       } else {
+        // Geri yerine yaylanarak dön
+        sheetEl.style.transition = "transform 0.26s cubic-bezier(0.16, 1, 0.3, 1)";
         sheetEl.style.transform = "translateY(0)";
+        setTimeout(() => {
+          sheetEl.style.transition = "";
+        }, 270);
       }
     });
 
@@ -870,7 +854,6 @@
         sets.forEach((set, idx) => {
           const isDone = set.done;
           
-          // Renkli Tür Rozet Sınıfı
           let typeColorClass = "text-zinc-300";
           if (set.type === "F") typeColorClass = "text-rose-400 font-extrabold";
           else if (set.type === "W") typeColorClass = "text-amber-400 font-extrabold";
@@ -905,7 +888,7 @@
                 ${ex.name} <span class="text-zinc-600 text-[10px]">›</span>
               </h3>
               <p class="text-[10px] text-zinc-500 font-medium mt-0.5">
-                ${ex.muscle} ${lastRec ? `• <span class="text-zinc-400 font-num">Son: ${lastRec.kg}kg × ${lastRec.reps}</span>` : ''}
+                ${ex.muscle}
               </p>
             </div>
 
@@ -1005,7 +988,6 @@
     }
 
     function addSet(exId) {
-      triggerHaptic("light");
       if (!routineSets[currentRoutineId][exId]) {
         routineSets[currentRoutineId][exId] = [];
       }
@@ -1026,7 +1008,6 @@
     }
 
     function removeSet(exId) {
-      triggerHaptic("light");
       if (routineSets[currentRoutineId] && routineSets[currentRoutineId][exId] && routineSets[currentRoutineId][exId].length > 0) {
         routineSets[currentRoutineId][exId].pop();
         saveRoutineSets();
@@ -1041,20 +1022,18 @@
       saveRoutineSets();
 
       if (set.done) {
-        triggerHaptic("medium");
         const hist = getHistory(exId);
         const date = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
         hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type, setNumber: idx + 1, timestamp: Date.now() });
         saveHistory(exId, hist);
 
-        // Dinlenme Sayacını Başlat
-        startRestTimer(90);
+        // İleriye Sayan Üst Sayacı Başlat
+        startForwardRestTimer();
       }
       renderWorkout(false);
     }
 
     function removeExerciseFromRoutine(exId) {
-      triggerHaptic("medium");
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
       current.exerciseIds = current.exerciseIds.filter(id => id !== exId);
@@ -1062,36 +1041,29 @@
       renderWorkout(false);
     }
 
-    // --- DİNLENME SÜRESİ SAYACI (REST TIMER) ---
-    function startRestTimer(seconds = 90) {
-      restSecondsLeft = seconds;
+    // --- EN ÜSTTE BÜYÜK DİNLENME SAYACI (İLERİYE SAYAN KRONOMETRE) ---
+    function startForwardRestTimer() {
+      restSecondsElapsed = 0;
       document.getElementById("restTimerBar").classList.remove("hidden");
       updateRestTimerDisplay();
 
       if (restTimerInterval) clearInterval(restTimerInterval);
       restTimerInterval = setInterval(() => {
-        restSecondsLeft--;
-        if (restSecondsLeft <= 0) {
-          clearInterval(restTimerInterval);
-          triggerHaptic("heavy");
-          closeRestTimer();
-        } else {
-          updateRestTimerDisplay();
-        }
+        restSecondsElapsed++;
+        updateRestTimerDisplay();
       }, 1000);
     }
 
     function updateRestTimerDisplay() {
-      const m = Math.floor(restSecondsLeft / 60);
-      const s = restSecondsLeft % 60;
+      const m = Math.floor(restSecondsElapsed / 60);
+      const s = restSecondsElapsed % 60;
       document.getElementById("restTimerDisplay").innerText = 
         `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
 
-    function adjustRestTimer(delta) {
-      restSecondsLeft = Math.max(5, restSecondsLeft + delta);
+    function resetRestTimer() {
+      restSecondsElapsed = 0;
       updateRestTimerDisplay();
-      triggerHaptic("light");
     }
 
     function closeRestTimer() {
@@ -1123,7 +1095,6 @@
           }
         });
 
-        // PR Kontrolü
         const hist = getHistory(exId);
         const prevHist = hist.slice(0, -sets.filter(s => s.done).length);
         const prevMax = getMaxKg(prevHist) || 0;
@@ -1145,7 +1116,6 @@
       }
 
       document.getElementById("summaryModal").classList.remove("hidden");
-      triggerHaptic("heavy");
       lockScroll();
     }
 
@@ -1189,21 +1159,6 @@
         }
       });
       return max > 0 ? max : null;
-    }
-
-    // Brzycki Formülü ile 1RM Hesaplama
-    function calculate1RM(hist) {
-      if (!hist || hist.length === 0) return null;
-      let best1RM = 0;
-      hist.forEach(h => {
-        const kg = parseFloat(h.kg) || 0;
-        const reps = parseFloat(h.reps) || 0;
-        if (kg > 0 && reps > 0) {
-          const est = kg * (36 / (37 - reps));
-          if (est > best1RM) best1RM = est;
-        }
-      });
-      return best1RM > 0 ? Math.round(best1RM) : null;
     }
 
     function renderLibrary() {
@@ -1330,14 +1285,8 @@
       histContainer.innerHTML = "";
 
       const maxKg = getMaxKg(hist);
-      const est1RM = calculate1RM(hist);
       document.getElementById("libDetailMaxKg").innerText = maxKg ? `${maxKg} KG` : "Kayıt Yok";
       document.getElementById("libDetailFirstDate").innerText = (hist.length > 0) ? hist[0].date : "Kayıt Yok";
-      document.getElementById("libDetailEst1RM").innerText = est1RM ? `${est1RM} KG` : "-";
-
-      // Plaka hesaplayıcıyı son kiloyla hazırla
-      document.getElementById("inputTargetPlateKg").value = maxKg || 60;
-      calculatePlates();
 
       renderGroupedHistory(hist, histContainer, "lib_day_");
 
@@ -1355,43 +1304,6 @@
     function closeLibraryDetail() {
       document.getElementById("viewLibraryDetail").classList.add("hidden");
       openLibraryPage();
-    }
-
-    // --- PLAKA HESAPLAYICI MOTORU (BAR = 20KG) ---
-    function calculatePlates() {
-      const target = parseFloat(document.getElementById("inputTargetPlateKg").value) || 0;
-      const resLabel = document.getElementById("plateCalcResult");
-      const visual = document.getElementById("plateVisualDisplay");
-      visual.innerHTML = "";
-
-      if (target < 20) {
-        resLabel.innerText = "Minimum 20 KG (Bar)";
-        return;
-      }
-
-      let perSide = (target - 20) / 2;
-      resLabel.innerText = `Her Taraf: ${perSide} KG`;
-
-      const availablePlates = [20, 15, 10, 5, 2.5, 1.25];
-      const usedPlates = [];
-
-      availablePlates.forEach(p => {
-        while (perSide >= p) {
-          usedPlates.push(p);
-          perSide -= p;
-        }
-      });
-
-      if (usedPlates.length === 0) {
-        visual.innerHTML = `<span class="text-xs text-zinc-500 font-bold">Sadece Boş Bar (20 KG)</span>`;
-      } else {
-        usedPlates.forEach(p => {
-          const badge = document.createElement("span");
-          badge.className = "px-2 py-1 bg-zinc-900 border border-zinc-700 text-blue-400 font-num font-black text-xs rounded-lg shadow-sm";
-          badge.innerText = `${p}kg`;
-          visual.appendChild(badge);
-        });
-      }
     }
 
     // --- PROGRAM İÇİ DETAY SAYFASI ---
@@ -1469,7 +1381,6 @@
       if (!selectedDetailExId) return;
       const note = document.getElementById("workoutExNoteInput").value;
       localStorage.setItem(`fit_note_${selectedDetailExId}`, note);
-      triggerHaptic("light");
       alert("Not kaydedildi!");
     }
 
@@ -1562,7 +1473,6 @@
     }
 
     function toggleDayDetails(elId) {
-      triggerHaptic("light");
       const detailsEl = document.getElementById(elId);
       const arrowEl = document.getElementById(`arrow_${elId}`);
       if (detailsEl.classList.contains("hidden")) {
@@ -1623,7 +1533,6 @@
     }
 
     function toggleTempSelection(exId) {
-      triggerHaptic("light");
       if (tempSelectedExerciseIds.includes(exId)) {
         tempSelectedExerciseIds = tempSelectedExerciseIds.filter(id => id !== exId);
       } else {
@@ -1672,9 +1581,8 @@
       }
     }
 
-    // --- DIŞA / İÇE AKTAR (YEDEKLEME SİSTEMİ) ---
+    // --- YEDEKLEME SİSTEMİ ---
     function exportData() {
-      triggerHaptic("medium");
       const fullBackup = {
         pool: globalExercisePool,
         routines: routines,
