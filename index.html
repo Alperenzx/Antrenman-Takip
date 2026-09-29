@@ -66,10 +66,6 @@
       from { opacity: 0; transform: scale(0.92) translateY(10px); }
       to { opacity: 1; transform: scale(1) translateY(0); }
     }
-    @keyframes sheetSlideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -79,7 +75,6 @@
       50% { transform: rotate(0.8deg); }
       100% { transform: rotate(-0.8deg); }
     }
-
     @keyframes pillDropIn {
       0% { opacity: 0; transform: translate(-50%, -24px) scale(0.92); }
       100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -89,7 +84,6 @@
     .anim-back { animation: pageSlideBack 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-card { animation: cardFadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-pop { animation: modalCenterPop 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .anim-sheet { animation: sheetSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .anim-fade { animation: fadeIn 0.2s ease-out forwards; }
     .wiggle { animation: wiggleEffect 0.24s ease-in-out infinite; }
     .anim-pill { animation: pillDropIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -121,7 +115,6 @@
       min-height: 100vh;
     }
 
-    /* Dynamic Island Tarzı Kompakt Dinlenme Sayacı */
     .island-timer {
       position: fixed;
       top: calc(var(--sat) + 6px);
@@ -129,11 +122,30 @@
       transform: translateX(-50%);
       z-index: 999;
     }
+
+    /* Modal Backdrop ve Sheet Geçişleri */
+    #exercisePickerModal {
+      transition: opacity 0.28s ease, backdrop-filter 0.28s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #exercisePickerModal.show-modal {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #exercisePickerSheet {
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: transform;
+    }
+    #exercisePickerModal.show-modal #exercisePickerSheet {
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body class="min-h-screen pb-32 antialiased">
 
-  <!-- ================= DYNAMIC ISLAND TARZI MODERN DİNLENME SAYACI ================= -->
+  <!-- ================= DYNAMIC ISLAND DİNLENME SAYACI ================= -->
   <div id="restTimerBar" class="island-timer hidden anim-pill">
     <div class="flex items-center gap-3 bg-zinc-900/90 border border-zinc-700/80 px-3.5 py-1.5 rounded-full shadow-2xl backdrop-blur-2xl">
       <div class="flex items-center gap-2">
@@ -313,7 +325,6 @@
       <div class="w-9"></div>
     </header>
 
-    <!-- 1. EN ÜST: NOTLAR & AYARLAR -->
     <section class="mt-4 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">HAREKET NOTLARI & AYARLAR</h3>
@@ -322,7 +333,6 @@
       <textarea id="workoutExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black border border-zinc-850 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
-    <!-- 2. BÜYÜTÜLMÜŞ REKLAMSIZ VİDEO BÖLÜMÜ -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-2.5 px-1">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM REHBERİ VİDEOSU</h3>
@@ -338,7 +348,6 @@
       </button>
     </section>
 
-    <!-- 3. VİDEONUN ALTI: AĞIRLIK GELİŞİM GRAFİĞİ -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-900 rounded-3xl p-4 shadow-lg">
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-xs font-bold text-zinc-400 font-num tracking-wide">AĞIRLIK GELİŞİMİ</h3>
@@ -349,7 +358,6 @@
       </div>
     </section>
 
-    <!-- 4. EN ALT: ANTRENMAN GEÇMİŞİ -->
     <section class="mt-4 mb-8">
       <div class="flex justify-between items-center mb-2 px-1">
         <h3 class="text-xs font-bold text-zinc-400 font-num uppercase tracking-wider">Antrenman Geçmişi</h3>
@@ -430,13 +438,13 @@
   </div>
 
 
-  <!-- ================= ALTTAN AÇILAN EGZERSİZ SEÇİM PANELİ (AŞAĞI ÇEKME ANİMASYONLU) ================= -->
-  <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-end justify-center anim-fade" onclick="closeExerciseSelector(event)">
-    <div id="exercisePickerSheet" class="bg-zinc-950 border-t border-zinc-800 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl anim-sheet" onclick="event.stopPropagation()">
+  <!-- ================= ALTTAN AÇILAN EGZERSİZ SEÇİM PANELİ (AŞAĞI AKAN ANİMASYONLU) ================= -->
+  <div id="exercisePickerModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center" onclick="closeExerciseSelector(event)">
+    <div id="exercisePickerSheet" class="bg-zinc-950 border-t border-zinc-800 w-full max-w-md rounded-t-[32px] p-5 max-h-[85vh] flex flex-col shadow-2xl" onclick="event.stopPropagation()">
       
-      <!-- Çekerek Kapatma Bölgesi (Tutamaç + Üst Bar) -->
-      <div id="sheetDragArea" class="py-2.5 -mt-2 cursor-grab active:cursor-grabbing w-full flex flex-col items-center">
-        <div class="w-12 h-1.5 bg-zinc-700 hover:bg-zinc-500 rounded-full mb-3 transition"></div>
+      <!-- Çekerek Kapatma Bölgesi (Tutamaç + Üst Çubuk) -->
+      <div id="sheetDragArea" class="py-3 -mt-2 cursor-grab active:cursor-grabbing w-full flex flex-col items-center">
+        <div class="w-12 h-1.5 bg-zinc-700 hover:bg-zinc-500 rounded-full transition"></div>
       </div>
       
       <div class="flex justify-between items-center mb-2 px-1">
@@ -520,7 +528,6 @@
 
     let routineSets = JSON.parse(localStorage.getItem("fit_routine_sets")) || {};
 
-    // DİNLENME SAYACI DEĞİŞKENLERİ
     let restTimerInterval = null;
     let restSecondsElapsed = 0;
 
@@ -660,9 +667,10 @@
       history.pushState({ page: pageName }, "");
     }
 
-    // ================= AŞAĞI ÇEKEREK EGZERSİZ PANELİNİ KAPATMA (MÜKEMMEL AKICI FİZİK) =================
+    // ================= AŞAĞI ÇEKEREK EGZERSİZ PANELİNİ KAPATMA (GERÇEKÇİ SÜZÜLME ANİMASYONU) =================
     let sheetStartY = 0;
     let isDraggingSheet = false;
+    const modalEl = document.getElementById("exercisePickerModal");
     const sheetEl = document.getElementById("exercisePickerSheet");
     const dragArea = document.getElementById("sheetDragArea");
 
@@ -679,6 +687,8 @@
       const deltaY = currentY - sheetStartY;
       if (deltaY > 0) {
         sheetEl.style.transform = `translateY(${deltaY}px)`;
+        const opacity = Math.max(0.2, 1 - (deltaY / 300));
+        modalEl.style.backgroundColor = `rgba(0, 0, 0, ${0.8 * opacity})`;
       }
     }, { passive: true });
 
@@ -688,24 +698,54 @@
       const currentY = e.changedTouches[0].clientY;
       const deltaY = currentY - sheetStartY;
 
-      if (deltaY > 90) {
-        // Aşağı kayarak akıcıca kapanma
-        sheetEl.style.transition = "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)";
-        sheetEl.style.transform = "translateY(100%)";
-        setTimeout(() => {
-          sheetEl.style.transform = "";
-          sheetEl.style.transition = "";
-          closeExerciseSelector();
-        }, 260);
+      if (deltaY > 80) {
+        // Yumuşakça aşağı akarak kapan
+        animateCloseSheet();
       } else {
-        // Geri yerine yaylanma
+        // Geri yerine yaylan
         sheetEl.style.transition = "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)";
         sheetEl.style.transform = "translateY(0)";
-        setTimeout(() => {
-          sheetEl.style.transition = "";
-        }, 280);
+        modalEl.style.backgroundColor = "";
       }
     });
+
+    function openExerciseSelector() {
+      const current = routines.find(r => r.id === currentRoutineId);
+      if (!current) return;
+
+      tempSelectedExerciseIds = [...current.exerciseIds];
+      renderPickerList();
+
+      modalEl.classList.remove("hidden");
+      modalEl.offsetHeight; // Reflow
+      modalEl.classList.add("show-modal");
+      sheetEl.style.transform = "";
+      modalEl.style.backgroundColor = "";
+      lockScroll();
+    }
+
+    function animateCloseSheet() {
+      sheetEl.style.transition = "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)";
+      modalEl.style.transition = "opacity 0.28s ease";
+      sheetEl.style.transform = "translateY(100%)";
+      modalEl.style.opacity = "0";
+
+      setTimeout(() => {
+        modalEl.classList.remove("show-modal");
+        modalEl.classList.add("hidden");
+        modalEl.style.opacity = "";
+        sheetEl.style.transform = "";
+        sheetEl.style.transition = "";
+        modalEl.style.transition = "";
+        modalEl.style.backgroundColor = "";
+        unlockScroll();
+      }, 280);
+    }
+
+    function closeExerciseSelector(event) {
+      if (event && event.target !== modalEl && !event.target.classList.contains("tap-press")) return;
+      animateCloseSheet();
+    }
 
     // --- SAYFA GEÇİŞLERİ ---
     function goHome() {
@@ -1034,7 +1074,6 @@
         hist.push({ date, kg: set.kg, reps: set.reps || "8", type: set.type, setNumber: idx + 1, timestamp: Date.now() });
         saveHistory(exId, hist);
 
-        // İleriye Sayan Modern Dynamic Island Sayacını Başlat
         startForwardRestTimer();
       }
       renderWorkout(false);
@@ -1048,7 +1087,7 @@
       renderWorkout(false);
     }
 
-    // --- MODERN DYNAMIC ISLAND REST TIMER MOTORU ---
+    // --- REST TIMER ---
     function startForwardRestTimer() {
       restSecondsElapsed = 0;
       const bar = document.getElementById("restTimerBar");
@@ -1079,7 +1118,7 @@
       document.getElementById("restTimerBar").classList.add("hidden");
     }
 
-    // --- ANTRENMAN BİTİR VE ÖZET POPUP'I ---
+    // --- ANTRENMAN BİTİR ---
     function finishWorkout() {
       const routine = routines.find(r => r.id === currentRoutineId);
       if (!routine) return;
@@ -1493,21 +1532,6 @@
     }
 
     // --- HAVUZDAN ÇOKLU SEÇİM ---
-    function openExerciseSelector() {
-      const current = routines.find(r => r.id === currentRoutineId);
-      if (!current) return;
-
-      tempSelectedExerciseIds = [...current.exerciseIds];
-      renderPickerList();
-      document.getElementById("exercisePickerModal").classList.remove("hidden");
-      lockScroll();
-    }
-
-    function closeExerciseSelector() {
-      document.getElementById("exercisePickerModal").classList.add("hidden");
-      unlockScroll();
-    }
-
     function renderPickerList() {
       const list = document.getElementById("pickerList");
       list.innerHTML = "";
@@ -1555,7 +1579,7 @@
 
       current.exerciseIds = [...tempSelectedExerciseIds];
       saveRoutines();
-      closeExerciseSelector();
+      animateCloseSheet();
       renderWorkout(true);
     }
 
