@@ -49,7 +49,6 @@
       touch-action: none;
     }
 
-    /* Animasyonlar */
     @keyframes pageSlideIn {
       from { opacity: 0; transform: translateX(20px); }
       to { opacity: 1; transform: translateX(0); }
@@ -210,7 +209,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI (SAF İSTATİSTİK) ================= -->
+  <!-- ================= SAYFA 4: EGZERSİZ HAVUZU DETAYI ================= -->
   <div id="viewLibraryDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeLibraryDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -254,7 +253,7 @@
   </div>
 
 
-  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI (YENİ SIRALAMA İLE) ================= -->
+  <!-- ================= SAYFA 5: PROGRAM İÇİ DETAY SAYFASI ================= -->
   <div id="viewWorkoutExerciseDetail" class="swipeable-view hidden px-4 max-w-md mx-auto">
     <header class="py-3 border-b border-zinc-800/80 flex justify-between items-center sticky top-0 bg-black/95 backdrop-blur-md z-30">
       <button onclick="closeWorkoutExerciseDetail()" class="tap-press w-9 h-9 rounded-2xl bg-zinc-900 border border-zinc-800/80 flex items-center justify-center text-sm font-bold text-zinc-300">
@@ -276,17 +275,22 @@
       <textarea id="workoutExNoteInput" placeholder="Örn: Sehpa açısı 2. kademede, tutuş genişliği omuz hizasında..." class="w-full h-20 bg-black/80 border border-zinc-800/80 rounded-2xl p-3 text-xs text-zinc-200 focus:outline-none focus:border-blue-500/50 resize-none font-medium leading-relaxed"></textarea>
     </section>
 
-    <!-- 2. HEMEN ALTI: FORM & YAPILIŞ VİDEOSU (GÖMÜLÜ / EMBEDDED OYNATICI) -->
+    <!-- 2. BÜYÜTÜLMÜŞ REKLAMSIZ VİDEO BÖLÜMÜ -->
     <section class="mt-3.5 bg-zinc-950 border border-zinc-800/80 rounded-3xl p-4 shadow-lg">
-      <div class="flex justify-between items-center mb-2 px-1">
+      <div class="flex justify-between items-center mb-2.5 px-1">
         <h3 class="text-xs font-bold text-zinc-400 tracking-wide">FORM REHBERİ VİDEOSU</h3>
         <span class="text-[10px] text-blue-400 font-bold">Özel Kesit</span>
       </div>
       
-      <!-- 16:9 YouTube Gömülü Oynatıcı -->
-      <div id="workoutVideoContainer" class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-850 shadow-inner">
+      <!-- Büyütülmüş 16:9 Oynatıcı -->
+      <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-850 shadow-2xl">
         <iframe id="workoutVideoIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
+
+      <!-- YouTube Premium ile Aç Butonu -->
+      <button id="btnOpenNativeYouTube" onclick="openVideoInYouTubeApp()" class="w-full mt-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-red-500/40 text-zinc-300 font-bold text-xs flex items-center justify-center gap-2 tap-press">
+        <span class="text-red-500 text-sm">▶</span> YouTube Uygulamasında Aç (Reklamsız / Tam Ekran)
+      </button>
     </section>
 
     <!-- 3. VİDEONUN ALTI: AĞIRLIK GELİŞİM GRAFİĞİ -->
@@ -376,81 +380,119 @@
 
 
   <script>
-    // İSTEDİĞİN GÜNCEL STANDART HAREKETLER VE DAKİKA/SANİYE VİDEO AYARLARI
-    const defaultExercisePool = [
+    // NET STANDART EGZERSİZ LİSTESİ (ÇAKIŞMALAR TEMİZLENDİ)
+    const cleanStandardPool = [
       { 
         id: "bp", 
         name: "Bench Press", 
         muscle: "Göğüs", 
-        videoUrl: "https://www.youtube.com/embed/hWbUlkb5Ms4?start=0" 
+        videoId: "hWbUlkb5Ms4",
+        start: 0,
+        end: 0
       },
       { 
         id: "cf", 
         name: "Chest Fly", 
         muscle: "Göğüs", 
-        videoUrl: "https://www.youtube.com/embed/I-Ue34qLxc4?start=0" 
+        videoId: "I-Ue34qLxc4",
+        start: 0,
+        end: 0
       },
       { 
         id: "clr", 
         name: "Cable Lateral Raise", 
         muscle: "Omuz", 
-        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=420&end=553" 
+        videoId: "928aRhhPP8I",
+        start: 420,
+        end: 553
       },
       { 
         id: "sspm", 
         name: "Seated Shoulder Press (Machine)", 
         muscle: "Omuz", 
-        videoUrl: "https://www.youtube.com/embed/6v4nrRVySj0?start=0" 
+        videoId: "6v4nrRVySj0",
+        start: 0,
+        end: 0
       },
       { 
         id: "pr", 
         name: "Pendlay Row", 
         muscle: "Sırt", 
-        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=553&end=659" 
+        videoId: "928aRhhPP8I",
+        start: 553,
+        end: 659
       },
       { 
         id: "scrvg", 
         name: "Seated Cable Row (V Grip)", 
         muscle: "Sırt", 
-        videoUrl: "https://www.youtube.com/embed/qD1WZ5pSuvk?start=0" 
+        videoId: "qD1WZ5pSuvk",
+        start: 0,
+        end: 0
       },
       { 
         id: "lp", 
         name: "Lat Pulldown", 
         muscle: "Sırt", 
-        videoUrl: "https://www.youtube.com/embed/hnSqbBk15tw?start=0" 
+        videoId: "hnSqbBk15tw",
+        start: 0,
+        end: 0
       },
       { 
         id: "coteb", 
         name: "Cable Overhead Triceps Extension", 
         muscle: "Triceps", 
-        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=659&end=710" 
+        videoId: "928aRhhPP8I",
+        start: 659,
+        end: 710
       },
       { 
         id: "bc", 
         name: "Bayesian Curl", 
         muscle: "Biceps", 
-        videoUrl: "https://www.youtube.com/embed/928aRhhPP8I?start=711&end=766" 
+        videoId: "928aRhhPP8I",
+        start: 711,
+        end: 766
       }
     ];
 
+    // İstenmeyen eski veya çakışan adları temizleyen liste
+    const unwantedNames = [
+      "back curl (cable)",
+      "back curl",
+      "overhead triceps extension (bar)",
+      "overhead triceps extension",
+      "single arm lateral raise",
+      "triceps bar baş üstü",
+      "biceps tek kol",
+      "seated cable row"
+    ];
+
     let savedPool = JSON.parse(localStorage.getItem("fit_pool")) || [];
-    defaultExercisePool.forEach(defEx => {
-      const existingIdx = savedPool.findIndex(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
-      if (existingIdx !== -1) {
-        // Mevcut hareketin videoUrl ve ismini güncelle
-        savedPool[existingIdx].videoUrl = defEx.videoUrl;
-        savedPool[existingIdx].name = defEx.name;
-        savedPool[existingIdx].muscle = defEx.muscle;
+    // İstenmeyen eski hareketleri filtrele
+    savedPool = savedPool.filter(item => !unwantedNames.includes(item.name.toLowerCase()));
+
+    // Standart temiz listeyi ekle/güncelle
+    cleanStandardPool.forEach(defEx => {
+      const idx = savedPool.findIndex(s => s.id === defEx.id || s.name.toLowerCase() === defEx.name.toLowerCase());
+      if (idx !== -1) {
+        savedPool[idx] = { ...savedPool[idx], ...defEx };
       } else {
         savedPool.push(defEx);
       }
     });
-    if (savedPool.length === 0) savedPool = [...defaultExercisePool];
-    localStorage.setItem("fit_pool", JSON.stringify(savedPool));
 
+    localStorage.setItem("fit_pool", JSON.stringify(savedPool));
     let globalExercisePool = savedPool;
+
     let routines = JSON.parse(localStorage.getItem("fit_routines")) || [];
+    // Rutinlerde kalan istenmeyen eski id'leri temizle
+    const validIds = globalExercisePool.map(e => e.id);
+    routines.forEach(r => {
+      r.exerciseIds = r.exerciseIds.filter(id => validIds.includes(id));
+    });
+    localStorage.setItem("fit_routines", JSON.stringify(routines));
+
     let currentRoutineId = null;
     let selectedDetailExId = null;
     let isCreatingFromLibrary = false;
@@ -511,7 +553,7 @@
       }
     }
 
-    // --- APPLE STANDARTLARINDA SOLDAN SAĞA SWIPE-TO-BACK MOTORU ---
+    // --- APPLE SWIPE-TO-BACK MOTORU ---
     let touchStartX = 0;
     let touchStartY = 0;
     let isSwipingBack = false;
@@ -1073,7 +1115,7 @@
       }
     }
 
-    // --- KÜTÜPHANE DETAYI (SAF İSTATİSTİK) ---
+    // --- KÜTÜPHANE DETAYI ---
     function openLibraryDetail(exId) {
       const ex = globalExercisePool.find(e => e.id === exId);
       if (!ex) return;
@@ -1108,7 +1150,9 @@
       openLibraryPage();
     }
 
-    // --- PROGRAM İÇİ DETAY SAYFASI (YENİ SIRALAMA & GÖMÜLÜ VİDEO) ---
+    // --- PROGRAM İÇİ DETAY SAYFASI ---
+    let currentActiveVideoData = null;
+
     function openWorkoutExerciseDetail(exId) {
       selectedDetailExId = exId;
       const ex = globalExercisePool.find(e => e.id === exId);
@@ -1122,12 +1166,18 @@
       const note = localStorage.getItem(`fit_note_${exId}`) || "";
       document.getElementById("workoutExNoteInput").value = note;
 
-      // 2. Özel YouTube Kesiti İframe'e Yükle
+      // 2. Reklamsız YouTube Embed Parametreleri
+      currentActiveVideoData = ex;
       const iframe = document.getElementById("workoutVideoIframe");
-      if (ex.videoUrl) {
-        iframe.src = ex.videoUrl;
+      if (ex.videoId) {
+        let embedUrl = `https://www.youtube-nocookie.com/embed/${ex.videoId}?rel=0&modestbranding=1&playsinline=1`;
+        if (ex.start > 0) embedUrl += `&start=${ex.start}`;
+        if (ex.end > 0) embedUrl += `&end=${ex.end}`;
+        iframe.src = embedUrl;
+        document.getElementById("btnOpenNativeYouTube").classList.remove("hidden");
       } else {
         iframe.src = "";
+        document.getElementById("btnOpenNativeYouTube").classList.add("hidden");
       }
 
       // 3. Gelişim Grafiğini Çiz
@@ -1148,10 +1198,25 @@
       vWDetail.classList.add("anim-forward");
     }
 
+    function openVideoInYouTubeApp() {
+      if (!currentActiveVideoData || !currentActiveVideoData.videoId) return;
+      const vId = currentActiveVideoData.videoId;
+      const startSec = currentActiveVideoData.start || 0;
+      
+      // iOS YouTube App URL Scheme (Önce uygulamayı dener, yoksa safari web'e düşer)
+      const appUrl = `vnd.youtube://${vId}?t=${startSec}`;
+      const webUrl = `https://www.youtube.com/watch?v=${vId}&t=${startSec}s`;
+
+      window.location.href = appUrl;
+      setTimeout(() => {
+        window.open(webUrl, "_blank");
+      }, 500);
+    }
+
     function closeWorkoutExerciseDetail() {
-      // Sayfadan çıkınca videoyu durdur
       const iframe = document.getElementById("workoutVideoIframe");
       iframe.src = "";
+      currentActiveVideoData = null;
 
       document.getElementById("viewWorkoutExerciseDetail").classList.add("hidden");
       const vWorkout = document.getElementById("viewWorkout");
@@ -1268,7 +1333,7 @@
       }
     }
 
-    // --- HAVUZDAN ÇOKLU SEÇİM ---
+    // --- HAVUZDAN ÇOKLU SEÇİM (SEÇİLENLER EN ÜSTTE SIRALANIR) ---
     function openExerciseSelector() {
       const current = routines.find(r => r.id === currentRoutineId);
       if (!current) return;
@@ -1288,7 +1353,16 @@
       const list = document.getElementById("pickerList");
       list.innerHTML = "";
 
-      globalExercisePool.forEach(ex => {
+      // Seçilenleri en üstte toplayan sıralama
+      const sortedPool = [...globalExercisePool].sort((a, b) => {
+        const aSelected = tempSelectedExerciseIds.includes(a.id);
+        const bSelected = tempSelectedExerciseIds.includes(b.id);
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+        return 0;
+      });
+
+      sortedPool.forEach(ex => {
         const isSelected = tempSelectedExerciseIds.includes(ex.id);
         const item = document.createElement("div");
         item.className = `tap-press flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer ${isSelected ? 'bg-blue-600/10 border-blue-500/50 shadow-md' : 'bg-black border-zinc-850'}`;
@@ -1343,7 +1417,7 @@
       const muscle = document.getElementById("newExMuscleInput").value.trim() || "Genel";
       if (!name) return;
 
-      const newEx = { id: "ex_" + Date.now(), name: name, muscle: muscle, videoUrl: "" };
+      const newEx = { id: "ex_" + Date.now(), name: name, muscle: muscle, videoId: "", start: 0, end: 0 };
       globalExercisePool.push(newEx);
       savePool();
 
